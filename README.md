@@ -49,7 +49,7 @@ Linux 依赖
 
 ### 理论支持平台
 
-支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray
+支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray 的平台
 
 ### 一定支持平台
 
