@@ -1,0 +1,10 @@
+pillow
+requests
+requests[socks]
+pysocks
+flask
+flask-cors
+pyyaml
+aiohttp
+aiohttp_socks
+pynat

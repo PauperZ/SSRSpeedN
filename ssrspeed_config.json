@@ -1,0 +1,170 @@
+{
+	"localAddress": "127.0.0.1",
+	"localPort": 1087,
+	"excludeRemarks": [
+		"剩余流量",
+		"到期时间",
+		"过期时间"
+	],
+	"proxy": {
+		"enabled": false,
+		"address": "127.0.0.1",
+		"port": 1080,
+		"username": null,
+		"password": null
+	},
+	"ntt": {
+		"enabled": true,
+		"internal_ip": "0.0.0.0",
+		"internal_port": 54320
+	},
+	"netflix": true,
+	"web": {
+		"listen": "127.0.0.1",
+		"port": 10870,
+		"token": ""
+	},
+	"exportResult": {
+		"uploadResult": false,
+		"hide_max_speed": false,
+		"font": "./resources/fonts/SourceHanSansCN-Medium.otf",
+		"colors": [
+			{
+				"name": "origin",
+				"colors": {
+					"4.0": [
+						102,
+						255,
+						102
+					],
+					"8.0": [
+						255,
+						255,
+						102
+					],
+					"16.0": [
+						255,
+						178,
+						102
+					],
+					"24.0": [
+						255,
+						102,
+						102
+					],
+					"32.0": [
+						226,
+						140,
+						255
+					],
+					"40.0": [
+						102,
+						204,
+						255
+					],
+					"50.0": [
+						102,
+						102,
+						255
+					]
+				}
+			},
+			{
+				"name": "poor",
+				"colors": {
+					"4.0": [
+						255,
+						215,
+						0
+					],
+					"8.0": [
+						255,
+						178,
+						1
+					],
+					"16.0": [
+						255,
+						0,
+						255
+					],
+					"24.0": [
+						64,
+						139,
+						255
+					],
+					"32.0": [
+						0,
+						100,
+						255
+					],
+					"40.0": [
+						19,
+						87,
+						191
+					],
+					"50.0": [
+						164,
+						53,
+						211
+					]
+				}
+			}
+		]
+	},
+	"uploadResult": {
+		"apiToken": "",
+		"server": "",
+		"remark": "Example Remark."
+	},
+	"fileDownload": {
+		"maxWorkers": 4,
+		"buffer": 4096,
+		"skipRuleMatch": false,
+		"rules": [
+			{
+				"mode": "match_isp",
+				"ISP": "Microsoft Corporation",
+				"tag": "Google"
+			},
+			{
+				"mode": "match_isp",
+				"ISP": "Google LLC",
+				"tag": "Default"
+			},
+			{
+				"mode": "match_location",
+				"countries": [
+					"TH"
+				],
+				"tag": "Google"
+			}
+		],
+		"downloadLinks": [
+			{
+				"link": "https://download.microsoft.com/download/7/A/8/7A84E002-6512-4506-A812-CA66FF6766D9/officeserversp2013-kb2880552-fullfile-x64-en-us.exe",
+				"fileSize": 1900,
+				"tag": "Default"
+			},
+			{
+				"link": "https://dl.google.com/dl/android/studio/install/3.4.1.0/android-studio-ide-183.5522156-windows.exe",
+				"fileSize": 971,
+				"tag": "Google"
+			}
+		]
+	},
+	"webPageSimulation": {
+		"maxThread": 4,
+		"urls": [
+			"https://www.google.com.hk",
+			"https://www.youtube.com",
+			"https://www.bing.com",
+			"https://www.github.com",
+			"https://www.microsoft.com"
+		],
+		"cnUrls": [
+			"https://www.baidu.com",
+			"https://www.weibo.com",
+			"https://www.qq.com"
+		]
+	}
+}
