@@ -77,6 +77,8 @@ Linux 依赖
 pip install -r requirements.txt
 ~~~~
 
+测速主程序及附加选项：
+
 ~~~~text
 python ./main.py
 Usage: main.py [options] arg1 arg2...
