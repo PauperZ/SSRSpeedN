@@ -12,21 +12,21 @@ Batch speed measuring tool based on Shadowsocks(R) and V2Ray
 
 ## 注意事项
 
-- 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性.
+- 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性
 
-- 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装.
-- 首次运行前请执行 开始测速.bat 安装pip及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装（其实我已经装好了，不过再走一遍传统步骤增加点仪式感也不错）.
-- logs文件夹用于记录测速日志，包含节点的详细信息及测速订阅，非必要请勿泄露.
-- 执行 开始测速.bat 批处理命令即可测速，测速结果保存在 results 文件夹下，不过大佬喜欢用命令行测也可以.
+- 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装
+- 首次运行前请执行 开始测速.bat 安装pip及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装（其实我已经装好了，不过再走一遍传统步骤增加点仪式感也不错）
+- logs文件夹用于记录测速日志，包含节点的详细信息及测速订阅，非必要请勿泄露
+- 执行 开始测速.bat 批处理命令即可测速，测速结果保存在 results 文件夹下，不过大佬喜欢用命令行测也可以
 
 ## 特性
 
 本项目在原 SSRSpeed (已跑路) 的基础上，集成了如下特性
 
-- 支持单线程/多线程同时测速，可以同时反映视频播放/多线程下载等场景的节点速度.
-- 支持 Netflix 解锁测试，分为 原生全解锁 / DNS全解锁 / 仅解锁自制剧 / 无解锁 四档.
-- 取消了原版的大红配色，默认为彩虹配色，并增加了新配色 (poor).
-- 无耻地增加了频道tag，可以在 result/export_result.py 中改为自己的tag.
+- 支持单线程/多线程同时测速，可以同时反映视频播放/多线程下载等场景的节点速度
+- 支持 Netflix 解锁测试，分为 原生全解锁 / DNS全解锁 / 仅解锁自制剧 / 无解锁 四档
+- 取消了原版的大红配色，默认为彩虹配色，并增加了新配色 (poor)
+- 无耻地增加了频道tag，可以在 result/export_result.py 中改为自己的tag
 
 ## 相关依赖
 
@@ -44,11 +44,12 @@ Linux 依赖
 ### 已测试平台
 
 1. Windows 10 x64
-放过要饭人士，MacOS和Linux属实没钱测/懒得测，期待更多后浪反馈.
+
+放过要饭人士，MacOS和Linux属实没钱测/懒得测，期待更多后浪反馈
 
 ### 理论支持平台
 
-支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray.
+支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray
 
 ### 一定支持平台
 
@@ -115,13 +116,13 @@ python main.py -u "https://home.yoyu.dev/subscriptionlink" --include 香港 Azur
 ## 自定义配置
 
 - **自定义颜色**
-  - 在 ssrspeed_config.json 文件下第 30 行，采用速度（MB/s）对应输出颜色 （RGB 256）方式.
+  - 在 ssrspeed_config.json 文件下第 30 行，采用速度（MB/s）对应输出颜色 （RGB 256）方式
 - **自定义字体**
-  - 下载字体文件放入 /resources/fonts/ 文件夹下，修改 ssrspeed_config.json 文件下第 29 行，本项目自带两个字体.
+  - 下载字体文件放入 /resources/fonts/ 文件夹下，修改 ssrspeed_config.json 文件下第 29 行，本项目自带两个字体
 - **修改测速项目**
-  - 在 ssrspeed_config.json 文件下第 16 行及第 21 行，可以设置是否进行udp类型及Netflix解锁测试，默认允许.
+  - 在 ssrspeed_config.json 文件下第 16 行及第 21 行，可以设置是否进行udp类型及Netflix解锁测试，默认允许
 
 
 ## 详细使用方法
 
-- 参见 gta5cloud.rip
+- 参见 https://gta5cloud.rip/
