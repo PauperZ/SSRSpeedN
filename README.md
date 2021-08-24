@@ -71,6 +71,8 @@ Linux 依赖
 
 ### 命令行测速（建议大佬使用）
 
+安装第三方库:
+
 ~~~~bash
 pip install -r requirements.txt
 ~~~~
