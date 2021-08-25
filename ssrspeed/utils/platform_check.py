@@ -11,7 +11,7 @@ def check_platform():
 			return "Windows"
 		elif("Linux" in tmp):
 			return "Linux"
-		elif("Darwin" in tmp):
+		elif("Darwin" in tmp or "mac" in tmp):
 			return "MacOS"
 		else:
 			return "Unknown"
