@@ -8,3 +8,4 @@ pyyaml
 aiohttp
 aiohttp_socks
 pynat
+beautifulsoup4
