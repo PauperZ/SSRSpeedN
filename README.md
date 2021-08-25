@@ -21,10 +21,10 @@ Batch speed measuring tool based on Shadowsocks(R) and V2Ray
 - 因为需要依赖 Python 环境，且本项目仍在测试阶段，可能存在部分 bug ，可到 [tg 频道](https://t.me/SSRSpeedN) 进行反馈。
 - Netflix 解锁测速结果说明:
 ~~~~text
-Full Native: 原生全解锁 
-Full Dns: Dns全解锁
-Only original: 仅解锁自制剧
-None: 未解锁
+Full Native             原生全解锁 
+Full Dns                DNS 全解锁
+Only original           仅解锁自制剧
+None                    未解锁
 其中原生解锁和DNS解锁只是解锁方式有区别，实际体验区别不大，在电视端使用时DNS解锁可能会提示使用代理。
 ~~~~
 
