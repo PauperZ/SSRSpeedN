@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://i.jpg.dog/file/jpg-dog/384700feddc6e66db4a0638166b937ac.png" alt="SSRSpeedN" width="200">
+    <img src="https://i.jpg.dog/file/jpg-dog/9160396e547d9abde7ec3199c571aa47.png" alt="SSRSpeedN" width="240">
 </h1>
 <p align="center">
 Batch speed measuring tool based on Shadowsocks(R) and V2Ray
