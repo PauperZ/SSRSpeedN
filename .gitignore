@@ -1,0 +1,7 @@
+results/
+logs/
+.idea/
+*/__pycache__/
+*/.DS_Store/
+config.json
+.DS_Store/
