@@ -6,7 +6,9 @@ import socket
 import logging
 logger = logging.getLogger("Sub")
 
+
 def tcp_ping(host, port):
+
 	alt=0
 	suc=0
 	fac=0
@@ -39,6 +41,7 @@ def tcp_ping(host, port):
 	return (alt/suc,suc/(suc+fac),_list)
 
 def google_ping(address, port=1080):
+
 	alt=0
 	suc=0
 	fac=0

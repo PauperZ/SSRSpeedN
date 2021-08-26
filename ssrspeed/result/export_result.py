@@ -33,6 +33,7 @@ class ExportResult(object):
 		self.__hide_max_speed = config["exportResult"]["hide_max_speed"]
 		self.__hide_ntt = not config["ntt"]["enabled"]
 		self.__hide_netflix = not config["netflix"]
+		self.__hide_stspeed = not config["StSpeed"]
 		self.__colors = {}
 		self.__colorSpeedList = []
 		self.__font = ImageFont.truetype(self.__config["font"],18)
@@ -155,7 +156,7 @@ class ExportResult(object):
 
 		
 	#	draw.line((0,newImageHeight - 30 - 1,imageRightPosition,newImageHeight - 30 - 1),fill=(127,127,127),width=1)
-		text = "便宜机场测速 With SSRSpeed ( v{} )".format(config["VERSION"])
+		text = "便宜机场测速 With SSRSpeed N ( v{} )".format(config["VERSION"])
 		draw.text((self.__getBasePos(imageRightPosition, text), 4),
 			text,
 			font=resultFont,
@@ -220,20 +221,38 @@ class ExportResult(object):
 			"Google Ping", font=resultFont, fill=(0,0,0)
 		)
 
-		draw.text(
-			(
-				googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "单线程"), 30 + 4
-			),
-			"单线程", font=resultFont, fill=(0,0,0)
-		)
-
-		if not self.__hide_max_speed:
+		if not self.__hide_stspeed:
 			draw.text(
 				(
-					dspeedRightPosition + self.__getBasePos(maxDSpeedRightPosition - dspeedRightPosition, "多线程"), 30 + 4
-					),
-				"多线程", font=resultFont, fill=(0,0,0)
+					googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "单线程"), 30 + 4
+				),
+				"单线程", font=resultFont, fill=(0,0,0)
 			)
+		else:
+			draw.text(
+				(
+					googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "AvgSpeed"),
+					30 + 4
+				),
+				"AvgSpeed", font=resultFont, fill=(0, 0, 0)
+			)
+
+		if not self.__hide_max_speed:
+			if not self.__hide_stspeed:
+				draw.text(
+					(
+						dspeedRightPosition + self.__getBasePos(maxDSpeedRightPosition - dspeedRightPosition, "多线程"), 30 + 4
+						),
+					"多线程", font=resultFont, fill=(0,0,0)
+				)
+			else:
+				draw.text(
+					(
+						dspeedRightPosition + self.__getBasePos(maxDSpeedRightPosition - dspeedRightPosition, "MaxSpeed"),
+						30 + 4
+					),
+					"MaxSpeed", font=resultFont, fill=(0, 0, 0)
+				)
 
 		if not self.__hide_ntt:
 			draw.text(

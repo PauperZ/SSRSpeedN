@@ -27,6 +27,8 @@ LOCAL_PORT = 1080
 LOCK = threading.Lock()
 TOTAL_RECEIVED = 0
 MAX_TIME = 0
+SPEED_TEST = config["speed"]
+STSPEED_TEST = config["StSpeed"]
 
 def setProxyPort(port):
 	global LOCAL_PORT
@@ -95,6 +97,10 @@ def speedTestThread(link):
 		return 0
 
 def speedTestSocket(port):
+
+	if not SPEED_TEST:
+		return (0, 0, [], 0)
+
 	global EXIT_FLAG,LOCAL_PORT,MAX_TIME,TOTAL_RECEIVED,MAX_FILE_SIZE
 	LOCAL_PORT = port
 
@@ -108,53 +114,53 @@ def speedTestSocket(port):
 	socks.set_default_proxy(socks.SOCKS5,"127.0.0.1", LOCAL_PORT)
 	socket.socket = socks.socksocket
      
-	
-	for i in range(0,1):
-		nmsl = threading.Thread(target=speedTestThread,args=(res[0],))
-		nmsl.start()
-		
-	maxSpeedList = []
-	maxSpeed = 0
-	currentSpeed = 0
-	OLD_RECEIVED = 0
-	DELTA_RECEIVED = 0
-	for i in range(1,11):
-		time.sleep(0.5)
-		LOCK.acquire()
-		DELTA_RECEIVED = TOTAL_RECEIVED - OLD_RECEIVED
-		OLD_RECEIVED = TOTAL_RECEIVED
-		LOCK.release()
-		currentSpeed = DELTA_RECEIVED / 0.5
-		maxSpeedList.append(currentSpeed)
-		print("\r[" + "="*i + "> [%d%%/100%%] [%.2f MB/s]" % (int(i * 10),currentSpeed / 1024 / 1024),end='')
-		if (EXIT_FLAG):
-			break
-	print("\r[" + "="*i + "] [100%%/100%%] [%.2f MB/s]" % (currentSpeed / 1024 / 1024),end='\n')
-	EXIT_FLAG = True
-	for i in range(0,10):
-		time.sleep(0.1)
-		if (MAX_TIME != 0):
-			break
-	if (MAX_TIME == 0):
-		logger.error("Socket Test Error !")
-		return (0, 0, [], 0)
-	restoreSocket()
-	rawSpeedList = copy.deepcopy(maxSpeedList)
-	maxSpeedList.sort()
-	if (len(maxSpeedList) > 12):
-		msum = 0
-		for i in range(12,len(maxSpeedList) - 2):
-			msum += maxSpeedList[i]
-		maxSpeed = (msum / (len(maxSpeedList) - 2 - 12))
-	else:
-		maxSpeed = currentSpeed
-	logger.info("SingleThread: Fetched {:.2f} KB in {:.2f} s.".format(TOTAL_RECEIVED / 1024, MAX_TIME))
+	if STSPEED_TEST:
+		for i in range(0,1):
+			nmsl = threading.Thread(target=speedTestThread,args=(res[0],))
+			nmsl.start()
 
-	AvgStSpeed = TOTAL_RECEIVED / MAX_TIME
+		maxSpeedList = []
+		maxSpeed = 0
+		currentSpeed = 0
+		OLD_RECEIVED = 0
+		DELTA_RECEIVED = 0
+		for i in range(1,11):
+			time.sleep(0.5)
+			LOCK.acquire()
+			DELTA_RECEIVED = TOTAL_RECEIVED - OLD_RECEIVED
+			OLD_RECEIVED = TOTAL_RECEIVED
+			LOCK.release()
+			currentSpeed = DELTA_RECEIVED / 0.5
+			maxSpeedList.append(currentSpeed)
+			print("\r[" + "="*i + "> [%d%%/100%%] [%.2f MB/s]" % (int(i * 10),currentSpeed / 1024 / 1024),end='')
+			if (EXIT_FLAG):
+				break
+		print("\r[" + "="*i + "] [100%%/100%%] [%.2f MB/s]" % (currentSpeed / 1024 / 1024),end='\n')
+		EXIT_FLAG = True
+		for i in range(0,10):
+			time.sleep(0.1)
+			if (MAX_TIME != 0):
+				break
+		if (MAX_TIME == 0):
+			logger.error("Socket Test Error !")
+			return (0, 0, [], 0)
+		restoreSocket()
+		rawSpeedList = copy.deepcopy(maxSpeedList)
+		maxSpeedList.sort()
+		if (len(maxSpeedList) > 12):
+			msum = 0
+			for i in range(12,len(maxSpeedList) - 2):
+				msum += maxSpeedList[i]
+			maxSpeed = (msum / (len(maxSpeedList) - 2 - 12))
+		else:
+			maxSpeed = currentSpeed
+		logger.info("SingleThread: Fetched {:.2f} KB in {:.2f} s.".format(TOTAL_RECEIVED / 1024, MAX_TIME))
 
-	MAX_TIME = 0
-	TOTAL_RECEIVED = 0
-	EXIT_FLAG = False
+		AvgStSpeed = TOTAL_RECEIVED / MAX_TIME
+
+		MAX_TIME = 0
+		TOTAL_RECEIVED = 0
+		EXIT_FLAG = False
 
 	for i in range(0,MAX_THREAD):
 		nmsl = threading.Thread(target=speedTestThread,args=(res[0],))
@@ -189,14 +195,18 @@ def speedTestSocket(port):
 	restoreSocket()
 	rawSpeedList = copy.deepcopy(maxSpeedList)
 	maxSpeedList.sort()
-	if (len(maxSpeedList) > 12):
+	if (len(maxSpeedList) > 7):
 		msum = 0
-		for i in range(12,len(maxSpeedList) - 2):
+		for i in range(7,len(maxSpeedList) - 2):
 			msum += maxSpeedList[i]
-		maxSpeed = (msum / (len(maxSpeedList) - 2 - 12))
+		maxSpeed = (msum / (len(maxSpeedList) - 2 - 7))
 	else:
 		maxSpeed = currentSpeed
 	logger.info("MultiThread: Fetched {:.2f} KB in {:.2f} s.".format(TOTAL_RECEIVED / 1024, MAX_TIME))
 	AvgSpeed = TOTAL_RECEIVED / MAX_TIME
+
+	if not STSPEED_TEST:
+		AvgStSpeed = AvgSpeed
+		AvgSpeed = maxSpeed
 
 	return (AvgStSpeed, AvgSpeed, rawSpeedList, TOTAL_RECEIVED)

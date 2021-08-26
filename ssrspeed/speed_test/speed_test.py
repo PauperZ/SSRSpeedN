@@ -20,6 +20,8 @@ from config import config
 
 LOCAL_ADDRESS = config["localAddress"]
 LOCAL_PORT = config["localPort"]
+PING_TEST = config["ping"]
+GOOGLE_PING_TEST = config["gping"]
 NETFLIX_TEXT = config["netflix"]
 ntype = "None"
 
@@ -34,7 +36,7 @@ class SpeedTest(object):
 			"group": "N/A",
 			"remarks": "N/A",
 			"loss": 1,
-			"ping": -1,
+			"ping": 0,
 			"gPingLoss": 1,
 			"gPing": 0,
 			"dspeed": -1,
@@ -129,7 +131,7 @@ class SpeedTest(object):
 			)
 		)
 
-		if NETFLIX_TEXT:
+		if NETFLIX_TEXT and outboundIP != "N/A":
 			logger.info("Performing netflix test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
 				headers = {
@@ -185,22 +187,26 @@ class SpeedTest(object):
 			"gPingLoss": self.__baseResult["gPingLoss"],
 			"rawGooglePingStatus": self.__baseResult["rawGooglePingStatus"]
 		}
-		st = SpeedTestMethods()
-		latencyTest = st.tcpPing(server, port)
-		res["loss"] = 1 - latencyTest[1]
-		res["ping"] = latencyTest[0]
-		res["rawTcpPingStatus"] = latencyTest[2]
-		logger.debug(latencyTest)
-		time.sleep(1)
-		if (latencyTest[0] > 0):
-			try:
-				googlePingTest = st.googlePing()
-				res["gPing"] = googlePingTest[0]
-				res["gPingLoss"] = 1 - googlePingTest[1]
-				res["rawGooglePingStatus"] = googlePingTest[2]
-			except:
-				logger.exception("")
-				pass
+
+		if PING_TEST:
+			st = SpeedTestMethods()
+			latencyTest = st.tcpPing(server, port)
+			res["loss"] = 1 - latencyTest[1]
+			res["ping"] = latencyTest[0]
+			res["rawTcpPingStatus"] = latencyTest[2]
+			logger.debug(latencyTest)
+			time.sleep(1)
+
+		if ((not PING_TEST) or (latencyTest[0] > 0)):
+			if GOOGLE_PING_TEST:
+				try:
+					googlePingTest = st.googlePing()
+					res["gPing"] = googlePingTest[0]
+					res["gPingLoss"] = 1 - googlePingTest[1]
+					res["rawGooglePingStatus"] = googlePingTest[2]
+				except:
+					logger.exception("")
+					pass
 		return res
 
 	def __nat_type_test(self):
@@ -304,7 +310,7 @@ class SpeedTest(object):
 				_item["geoIP"]["outbound"]["address"] = outboundInfo[0]
 				_item["geoIP"]["outbound"]["info"] = outboundInfo[1]
 
-				if (_item["gPing"] > 0 or outboundInfo[2] == "CN"):
+				if ((not GOOGLE_PING_TEST) or _item["gPing"] > 0 or outboundInfo[2] == "CN"):
 					st = SpeedTestMethods()
 					if test_mode == "WPS":
 						res = st.startWpsTest()
@@ -347,7 +353,7 @@ class SpeedTest(object):
 							)
 						)
 
-					elif test_mode == "FULL":	
+					elif test_mode == "FULL":
 						nat_info = ""
 						if config["ntt"]["enabled"]:
 							t, eip, eport, sip, sport = self.__nat_type_test()

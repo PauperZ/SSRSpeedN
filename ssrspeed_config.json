@@ -18,6 +18,10 @@
 		"internal_ip": "0.0.0.0",
 		"internal_port": 54320
 	},
+	"ping": true,
+	"gping": true,
+	"speed": true,
+	"StSpeed": true,
 	"netflix": true,
 	"web": {
 		"listen": "127.0.0.1",

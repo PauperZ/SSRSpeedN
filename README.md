@@ -70,6 +70,8 @@ Linux 依赖
   - [NyanChanMeow](https://github.com/NyanChanMeow)
 - beta版测试
   - [ChenBilly](https://t.me/ChenBilly)
+  - [Duang](https://t.me/duang11212)
+  - [万有引力](https://t.me/cloudspeedtest)
 - 建议及支持
   - [jiexi](https://t.me/jiexi001)
   - [萌新黑客](https://t.me/yxkumad)
@@ -129,12 +131,13 @@ python main.py -u "https://home.yoyu.dev/subscriptionlink" --include 香港 Azur
 ## 自定义配置
 
 - **自定义颜色**
-  - 在 ssrspeed_config.json 文件下第 30 行，采用速度（MB/s）对应输出颜色 （RGB 256）方式
+  - 在 ssrspeed_config.json 文件下第 35 行，采用速度（MB/s）对应输出颜色 （RGB 256）方式
 - **自定义字体**
-  - 下载字体文件放入 /resources/fonts/ 文件夹下，修改 ssrspeed_config.json 文件下第 29 行，本项目自带两个字体
+  - 下载字体文件放入 /resources/fonts/ 文件夹下，修改 ssrspeed_config.json 文件下第 34 行，本项目自带两个字体
 - **修改测速项目**
-  - 在 ssrspeed_config.json 文件下第 16 行及第 21 行，可以设置是否进行udp类型及Netflix解锁测试，默认允许
-
+  - 在 ssrspeed_config.json 文件下第 16 行及第 25 行，可以设置是否进行udp类型及Netflix解锁测试，默认允许。在 21-23行可以分别设置是否进行 ping / Google ping 测试，默认允许，若不进行测试，对应项在测速图上显示为0
+- **修改测速方式**
+  - 在 ssrspeed_config.json 文件下第 24 行，可以设置采用单/多线程测速方式或均速/最高速测速方式，默认为前者 
 
 ## 详细使用方法
 
