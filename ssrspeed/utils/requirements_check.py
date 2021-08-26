@@ -35,6 +35,22 @@ class RequirementsCheck(object):
 		}
 
 		self.__linuxRequire = {
+			"Shadowsocks-libev": [
+				# "./clients/shadowsocks-libev/obfs-local.exe",
+				"./clients/shadowsocks-libev/simple-obfs",
+				"./clients/shadowsocks-libev/ss-local",
+				# "./clients/shadowsocks-libev/ss-tunnel.exe"
+			],
+			"ShadowsocksR-libev": [
+				# "./clients/shadowsocksr-libev/libssp-0.dll",
+				# "./clients/shadowsocksr-libev/libwinpthread-1.dll",
+				# "./clients/shadowsocksr-libev/libpcre-1.dll",
+				# "./clients/shadowsocksr-libev/libcrypto-1_1.dll",
+				"./clients/shadowsocksr-libev/ssr-local"
+			],
+			# "ShadowsocksR-C#": [
+			# 	"./clients/shadowsocksr-win/shadowsocksr.exe"
+			# ],
 			"V2Ray-Core":[
 				"./clients/v2ray-core/v2ctl",
 				"./clients/v2ray-core/v2ray"
@@ -46,7 +62,8 @@ class RequirementsCheck(object):
 		if (pfInfo == "Windows"):
 			self.__checks(self.__winRequire)
 		elif (pfInfo == "Linux" or pfInfo == "MacOS"):
-			self.__linuxCheck()
+			self.__checks(self.__linuxRequire)
+			# self.__linuxCheck()
 		else:
 			logger.critical("Unsupport platform !")
 			sys.exit(1)
@@ -116,7 +133,7 @@ class RequirementsCheck(object):
 			if (not os.path.isdir(cmdpath)):
 				continue
 			for filename in os.listdir(cmdpath):
-				if (filename == "obfs-local"):
+				if (filename == "obfs-local" or filename == "simple-obfs"):
 					logger.info("Obfs-Local found {}".format(os.path.join(cmdpath,"obfs-local")))
 					simpleobfs = True
 				elif(filename == "ss-local"):

@@ -30,9 +30,9 @@ class Shadowsocks(BaseClient):
 				logger.info("Starting Shadowsocks-libev with server %s:%d" % (config["server"],config["server_port"]))
 			elif(self._checkPlatform() == "Linux" or self._checkPlatform() == "MacOS"):
 				if (logger.level == logging.DEBUG):
-					self._process = subprocess.Popen(["ss-local", "-u","-v","-c","%s/config.json" % os.getcwd()])
+					self._process = subprocess.Popen(["./clients/shadowsocks-libev/ss-local", "-u","-v","-c","%s/config.json" % os.getcwd()])
 				else:
-					self._process = subprocess.Popen(["ss-local", "-u","-c","%s/config.json" % os.getcwd()],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+					self._process = subprocess.Popen(["./clients/shadowsocks-libev/ss-local", "-u","-c","%s/config.json" % os.getcwd()],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 				logger.info("Starting Shadowsocks-libev with server %s:%d" % (config["server"],config["server_port"]))
 			else:
 				logger.critical("Your system does not supported.Please contact developer.")
