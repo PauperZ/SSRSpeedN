@@ -23,7 +23,19 @@ LOCAL_PORT = config["localPort"]
 PING_TEST = config["ping"]
 GOOGLE_PING_TEST = config["gping"]
 NETFLIX_TEXT = config["netflix"]
+HBO_TEXT = config["hbo"]
+DISNEY_TEXT = config["disney"]
+YOUTUBE_TEXT = config["youtube"]
+TVB_TEXT = config["tvb"]
+ABEMA_TEXT = config["abema"]
+BAHAMUT_TEXT = config["bahamut"]
 ntype = "None"
+htype = False
+dtype = False
+ytype = False
+ttype = False
+atype = False
+btype = False
 
 class SpeedTest(object):
 	def __init__(self, parser, method = "SOCKET", use_ssr_cs = False):
@@ -65,7 +77,13 @@ class SpeedTest(object):
 				"public_ip": "",
 				"public_port": 0
 			},
-            "Ntype": "N/A"
+            "Ntype": "N/A",
+			"Htype": False,
+			"Dtype": False,
+			"Ytype": False,
+			"Ttype": False,
+			"Atype": False,
+			"Btype": False,
 		}
 
 	def __getBaseResult(self):
@@ -172,6 +190,120 @@ class SpeedTest(object):
 				else:
 					logger.info("Netflix test result: Full DNS.")
 					ntype = "Full DNS"
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if HBO_TEXT and outboundIP != "N/A":
+			logger.info("Performing HBO max test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global htype
+				r = requests.get("https://www.hbomax.com/", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, timeout=20, allow_redirects=False)
+
+				if (r.status_code == 200):
+					htype = True
+				else:
+					htype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if DISNEY_TEXT and outboundIP != "N/A":
+			logger.info("Performing Disney plus test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global dtype
+				r = requests.get("https://www.disneyplus.com/", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, timeout=20, allow_redirects=False)
+
+				if (r.status_code == 200):
+					dtype = True
+				else:
+					dtype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if YOUTUBE_TEXT and outboundIP != "N/A":
+			logger.info("Performing Youtube Premium test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global ytype
+				r = requests.get("https://music.youtube.com/", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, timeout=20, allow_redirects=False)
+
+				if (r.status_code == 200):
+					ytype = True
+				else:
+					ytype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if TVB_TEXT and outboundIP != "N/A":
+			logger.info("Performing TVB test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global ttype
+				r = requests.get("https://www.mytvsuper.com/iptest.php", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, timeout=20, allow_redirects=False)
+
+				if (r.text.count("HK") > 0):
+					ttype = True
+				else:
+					ttype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if ABEMA_TEXT and outboundIP != "N/A":
+			logger.info("Performing Abema test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global atype
+				r = requests.get("https://api.abema.io/v1/ip/check?device=android", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, timeout=20, allow_redirects=False)
+
+				if (r.text.count("Country") > 0):
+					atype = True
+				else:
+					atype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if BAHAMUT_TEXT and outboundIP != "N/A":
+			logger.info("Performing Bahamut test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global btype
+				r = requests.get("https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=20, allow_redirects=False)
+
+				if (r.text.count("animeSn") > 0):
+					btype = True
+				else:
+					btype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
@@ -374,9 +506,21 @@ class SpeedTest(object):
 							logger.warn("Re-testing node.")
 							testRes = st.startTest(self.__testMethod)
 						global ntype
+						global htype
+						global dtype
+						global ytype
+						global ttype
+						global atype
+						global btype
 						_item["dspeed"] = testRes[0]
 						_item["maxDSpeed"] = testRes[1]
 						_item["Ntype"] = ntype
+						_item["Htype"] = htype
+						_item["Dtype"] = dtype
+						_item["Ytype"] = ytype
+						_item["Ttype"] = ttype
+						_item["Atype"] = atype
+						_item["Btype"] = btype
 						try:
 							_item["trafficUsed"] = testRes[3]
 							_item["rawSocketSpeed"] = testRes[2]

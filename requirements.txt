@@ -9,3 +9,4 @@ aiohttp
 aiohttp_socks
 pynat
 beautifulsoup4
+selenium

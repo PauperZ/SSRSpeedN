@@ -33,7 +33,9 @@ class ExportResult(object):
 		self.__hide_max_speed = config["exportResult"]["hide_max_speed"]
 		self.__hide_ntt = not config["ntt"]["enabled"]
 		self.__hide_netflix = not config["netflix"]
+		self.__hide_stream = not config["stream"]
 		self.__hide_stspeed = not config["StSpeed"]
+		self.__test_method = config["method"]
 		self.__colors = {}
 		self.__colorSpeedList = []
 		self.__font = ImageFont.truetype(self.__config["font"],18)
@@ -126,6 +128,21 @@ class ExportResult(object):
 		if (remarkWidth < 60):
 			remarkWidth = 90
 		otherWidth = 100
+
+		abema_logo = Image.open("./logos/abema.png")
+		abema_logo.thumbnail((28,28))
+		bahamut_logo = Image.open("./logos/Bahamut.png")
+		bahamut_logo.thumbnail((28,28))
+		disney_logo = Image.open("./logos/DisneyPlus.png")
+		disney_logo.thumbnail((28,28))
+		hbo_logo = Image.open("./logos/HBO.png")
+		hbo_logo.thumbnail((28,28))
+		netflix_logo = Image.open("./logos/Netflix.png")
+		netflix_logo.thumbnail((28,28))
+		tvb_logo = Image.open("./logos/tvb.png")
+		tvb_logo.thumbnail((28,28))
+		youtube_logo = Image.open("./logos/YouTube.png")
+		youtube_logo.thumbnail((28,28))
 	
 		groupRightPosition = groupWidth
 		remarkRightPosition = groupRightPosition + remarkWidth
@@ -135,8 +152,6 @@ class ExportResult(object):
 		dspeedRightPosition = googlePingRightPosition + otherWidth
 		maxDSpeedRightPosition = dspeedRightPosition     
 		imageRightPosition = dspeedRightPosition
-		ntt_right_position = imageRightPosition
-		netflix_right_position = imageRightPosition
 
 		if not self.__hide_max_speed:
 			imageRightPosition = maxDSpeedRightPosition + otherWidth 
@@ -149,6 +164,10 @@ class ExportResult(object):
 		if not self.__hide_netflix:
 			imageRightPosition = imageRightPosition + otherWidth + 60
 		netflix_right_position = imageRightPosition
+
+		if not self.__hide_stream:
+			imageRightPosition = imageRightPosition + otherWidth + 100
+		stream_right_position = imageRightPosition
 
 		newImageHeight = imageHeight + 30 * 3
 		resultImg = Image.new("RGB",(imageRightPosition, newImageHeight),(255,255,255))
@@ -179,7 +198,10 @@ class ExportResult(object):
 			draw.line((ntt_right_position, 30, ntt_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)    
 
 		if not self.__hide_netflix:
-			draw.line((netflix_right_position, 30, netflix_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)  
+			draw.line((netflix_right_position, 30, netflix_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_stream:
+			draw.line((stream_right_position, 30, stream_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
             
 		draw.line((imageRightPosition, 0, imageRightPosition, newImageHeight - 1),fill=(127,127,127),width=1)
 	
@@ -222,20 +244,57 @@ class ExportResult(object):
 		)
 
 		if not self.__hide_stspeed:
-			draw.text(
-				(
-					googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "单线程"), 30 + 4
-				),
-				"单线程", font=resultFont, fill=(0,0,0)
-			)
+			if(self.__test_method == "NETFLIX"):
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,"EndSpeed"),
+						30 + 4
+					),
+					"EndSpeed", font=resultFont, fill=(0, 0, 0)
+				)
+			elif (self.__test_method == "YOUTUBE"):
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+																	"StSpeed"),
+						30 + 4
+					),
+					"StSpeed", font=resultFont, fill=(0, 0, 0)
+				)
+			else:
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "单线程"), 30 + 4
+					),
+					"单线程", font=resultFont, fill=(0,0,0)
+				)
 		else:
-			draw.text(
-				(
-					googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "AvgSpeed"),
-					30 + 4
-				),
-				"AvgSpeed", font=resultFont, fill=(0, 0, 0)
-			)
+			if (self.__test_method == "NETFLIX"):
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+																	"EndSpeed"),
+						30 + 4
+					),
+					"EndSpeed", font=resultFont, fill=(0, 0, 0)
+				)
+			elif (self.__test_method == "YOUTUBE"):
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+																	"StSpeed"),
+						30 + 4
+					),
+					"StSpeed", font=resultFont, fill=(0, 0, 0)
+				)
+			else:
+				draw.text(
+					(
+						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,"AvgSpeed"),
+						30 + 4
+					),
+					"AvgSpeed", font=resultFont, fill=(0, 0, 0)
+				)
 
 		if not self.__hide_max_speed:
 			if not self.__hide_stspeed:
@@ -268,7 +327,15 @@ class ExportResult(object):
 					ntt_right_position + self.__getBasePos(netflix_right_position - ntt_right_position, "Netfilx 解锁"), 30 + 4
 					),
 				"Netfilx 解锁", font=resultFont, fill=(0,0,0)
-			)	
+			)
+
+		if not self.__hide_stream:
+			draw.text(
+				(
+					netflix_right_position + self.__getBasePos(stream_right_position - netflix_right_position, "流媒体解锁"), 30 + 4
+					),
+				"流媒体解锁", font=resultFont, fill=(0,0,0)
+			)
 		draw.line((0, 60, imageRightPosition - 1, 60),fill=(127,127,127),width=1)
 
 		totalTraffic = 0
@@ -334,6 +401,42 @@ class ExportResult(object):
 				netflix_type = item["Ntype"]
 				pos = ntt_right_position + self.__getBasePos(netflix_right_position - ntt_right_position, netflix_type)
 				draw.text((pos, 30 * j + 30 + 1), netflix_type,font=resultFont,fill=(0,0,0))
+
+			if not self.__hide_stream:
+				netflix_type = item["Ntype"]
+				hbo_type = item["Htype"]
+				disney_type = item["Dtype"]
+				youtube_type = item["Ytype"]
+				abema_type = item["Atype"]
+				bahamut_type = item["Btype"]
+				tvb_type = item["Ttype"]
+				if(netflix_type == "Full Native" or netflix_type == "Full DNS"):
+					n_type = True
+				else:
+					n_type = False
+				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type
+				pos = netflix_right_position + (stream_right_position - netflix_right_position - sums * 35) / 2
+				if n_type:
+					resultImg.paste(netflix_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if hbo_type:
+					resultImg.paste(hbo_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if disney_type:
+					resultImg.paste(disney_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if youtube_type:
+					resultImg.paste(youtube_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if abema_type:
+					resultImg.paste(abema_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if bahamut_type:
+					resultImg.paste(bahamut_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if tvb_type:
+					resultImg.paste(tvb_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
                     
 		files = []
 		if (totalTraffic < 0):

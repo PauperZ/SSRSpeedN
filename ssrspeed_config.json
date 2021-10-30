@@ -1,6 +1,6 @@
 {
 	"localAddress": "127.0.0.1",
-	"localPort": 1087,
+	"localPort": 10870,
 	"excludeRemarks": [
 		"剩余流量",
 		"到期时间",
@@ -19,10 +19,18 @@
 		"internal_port": 54320
 	},
 	"ping": true,
-	"gping": true,
+	"gping": false,
 	"speed": true,
-	"StSpeed": true,
+	"method": "SOCKET",
+	"StSpeed": false,
 	"netflix": true,
+	"stream": true,
+	"hbo": true,
+	"disney": true,
+	"youtube": true,
+	"abema": true,
+	"bahamut": true,
+	"tvb": true,
 	"web": {
 		"listen": "127.0.0.1",
 		"port": 10870,
@@ -87,29 +95,29 @@
 						1
 					],
 					"16.0": [
-						255,
-						0,
-						255
+						252,
+						105,
+						114
 					],
 					"24.0": [
-						64,
-						139,
-						255
+						233,
+						130,
+						217
 					],
 					"32.0": [
-						0,
-						100,
+						194,
+						108,
 						255
 					],
 					"40.0": [
-						19,
-						87,
-						191
+						102,
+						192,
+						255
 					],
 					"50.0": [
-						164,
-						53,
-						211
+						102,
+						111,
+						255
 					]
 				}
 			}

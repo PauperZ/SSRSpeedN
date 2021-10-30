@@ -13,6 +13,8 @@ logger = logging.getLogger("Sub")
 from . import speedtestnet
 from . import fast
 from . import st_socket as stSocket
+from . import st_ytb as stYtb
+from . import st_netflix as stNF
 from . import st_asyncio
 from . import webpage_simulation
 #import SSRSpeed.SpeedTest.Methods.cachefly as cachefly
@@ -24,6 +26,7 @@ from config import config
 LOCAL_ADDRESS = config["localAddress"]
 LOCAL_PORT = config["localPort"]
 DEFAULT_SOCKET = socket.socket
+METHOD = config["method"]
 
 class SpeedTestMethods(object):
 	def __init__(self):
@@ -70,6 +73,17 @@ class SpeedTestMethods(object):
 				logger.exception("")
 				return (0, 0, [], 0)
 		elif (method == "SOCKET"):#Old speedtest
+			try:
+				if(METHOD == "SOCKET"):
+					return stSocket.speedTestSocket(LOCAL_PORT)
+				if (METHOD == "YOUTUBE"):
+					return stYtb.speedTestYtb(LOCAL_PORT)
+				if (METHOD == "NETFLIX"):
+					return stNF.speedTestNetflix(LOCAL_PORT)
+			except:
+				logger.exception("")
+				return (0, 0, [], 0)
+		elif (method == "YOUTUBE"):
 			try:
 				return stSocket.speedTestSocket(LOCAL_PORT)
 			except:

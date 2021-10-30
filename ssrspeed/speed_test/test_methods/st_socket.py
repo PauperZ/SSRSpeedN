@@ -144,7 +144,7 @@ def speedTestSocket(port):
 		if (MAX_TIME == 0):
 			logger.error("Socket Test Error !")
 			return (0, 0, [], 0)
-		restoreSocket()
+		
 		rawSpeedList = copy.deepcopy(maxSpeedList)
 		maxSpeedList.sort()
 		if (len(maxSpeedList) > 12):
