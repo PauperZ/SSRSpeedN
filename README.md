@@ -12,7 +12,7 @@ Batch speed measuring tool based on Shadowsocks(R) and V2Ray
 
 ## 赞赏码
 <h1 align="center">
-    <img src="https://i.jpg.dog/file/jpg-dog/c1fd65efd85f41686d0d67fe4d09d21f.jpg" alt="SSRSpeedN" width="240">
+    <img src="https://i.jpg.dog/file/jpg-dog/c1fd65efd85f41686d0d67fe4d09d21f.jpg" alt="SSRSpeedN" width="512">
 </h1>
 <p align="center">
 要饭人士跪求各位大佬雪中送炭
