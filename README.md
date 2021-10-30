@@ -10,6 +10,14 @@ Batch speed measuring tool based on Shadowsocks(R) and V2Ray
   <a href="https://github.com/PauperZ/SSRSpeedN/blob/master/LICENSE"><img src="https://img.shields.io/github/license/PauperZ/SSRSpeedN.svg"></a>
 </p>
 
+## 赞赏码
+<h1 align="center">
+    <img src="https://i.jpg.dog/file/jpg-dog/c1fd65efd85f41686d0d67fe4d09d21f.jpg" alt="SSRSpeedN" width="240">
+</h1>
+<p align="center">
+要饭人士跪求各位大佬雪中送炭
+</p>
+
 ## 注意事项
 
 - 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性
