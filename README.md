@@ -41,6 +41,7 @@ None                    未解锁
 本项目在原 SSRSpeed (已跑路) 的基础上，集成了如下特性
 
 - 支持单线程/多线程同时测速，可以同时反映视频播放/多线程下载等场景的节点速度
+- 支持 fast.com / YOUTUBE 码率等多种测速方式（仅限 Windows）
 - 支持 Netflix 解锁测试，分为 原生全解锁 / DNS全解锁 / 仅解锁自制剧 / 无解锁 四档
 - 支持 流媒体平台 Abema/Bahamut 动画疯/Disney+//HBO max/My tvsuper/YouTube premium 的解锁测试
 - 配置文件中提供了测速模块的控制端，可以自由选择是否测速/测ping/检测流媒体解锁
