@@ -23,7 +23,7 @@ Batch speed measuring tool based on Shadowsocks(R) and V2Ray
 - 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性
 
 - 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装
-- 首次运行前请执行 开始测速.bat 安装pip及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装（其实我已经装好了，不过再走一遍传统步骤增加点仪式感也不错）
+- 首次运行前请执行 开始测速.bat 安装pip及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装
 - logs文件夹用于记录测速日志，包含节点的详细信息及测速订阅，非必要请勿泄露
 - 执行 开始测速.bat 批处理命令即可测速，测速结果保存在 results 文件夹下，不过大佬喜欢用命令行测也可以
 - 因为需要依赖 Python 环境，且本项目仍在测试阶段，可能存在部分 bug ，可到 [tg 群组](https://t.me/SSRSpeedN) 进行反馈。
