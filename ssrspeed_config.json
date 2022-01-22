@@ -32,7 +32,7 @@
 	"abema": true,
 	"bahamut": true,
 	"tvb": true,
-	"geoip":false,
+	"geoip":true,
 	"multiplex":true,
 	"web": {
 		"listen": "127.0.0.1",
