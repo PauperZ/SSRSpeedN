@@ -113,7 +113,7 @@ def speedTestSocket(port):
 	EXIT_FLAG = False
 	socks.set_default_proxy(socks.SOCKS5,"127.0.0.1", LOCAL_PORT)
 	socket.socket = socks.socksocket
-     
+
 	if STSPEED_TEST:
 		for i in range(0,1):
 			nmsl = threading.Thread(target=speedTestThread,args=(res[0],))

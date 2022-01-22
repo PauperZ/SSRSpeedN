@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import logging
+import requests
 logger = logging.getLogger("Sub")
 
 from .upload_result import pushToServer
@@ -35,7 +36,13 @@ class ExportResult(object):
 		self.__hide_netflix = not config["netflix"]
 		self.__hide_stream = not config["stream"]
 		self.__hide_stspeed = not config["StSpeed"]
-		self.__test_method = config["method"]
+		self.__test_method = not config["method"]
+		self.__hide_ping = not config["ping"]
+		self.__hide_gping = not config["gping"]
+		self.__hide_speed = not config["speed"]
+		self.__hide_port = not config["port"]
+		self.__hide_geoip = not config["geoip"]
+		self.__hide_multiplex = not config["multiplex"]
 		self.__colors = {}
 		self.__colorSpeedList = []
 		self.__font = ImageFont.truetype(self.__config["font"],18)
@@ -79,12 +86,18 @@ class ExportResult(object):
 		draw = ImageDraw.Draw(Image.new("RGB",(1,1),(255,255,255)))
 		maxGroupWidth = 0
 		maxRemarkWidth = 0
+		lenIn = 0
+		lenOut = 0
 		for item in result:
 			group = item["group"]
 			remark = item["remarks"]
+			inres = item["InRes"]
+			outres = item["OutRes"]
 			maxGroupWidth = max(maxGroupWidth,draw.textsize(group,font=font)[0])
 			maxRemarkWidth = max(maxRemarkWidth,draw.textsize(remark,font=font)[0])
-		return (maxGroupWidth + 10,maxRemarkWidth + 10)
+			lenIn = max(lenIn, draw.textsize(inres, font=font)[0])
+			lenOut = max(lenOut, draw.textsize(outres, font=font)[0])
+		return (maxGroupWidth + 10,maxRemarkWidth + 10,lenIn + 20,lenOut + 20)
 	
 	'''
 	def __deweighting(self,result):
@@ -123,10 +136,16 @@ class ExportResult(object):
 		weight = self.__getMaxWidth(result)
 		groupWidth = weight[0]
 		remarkWidth = weight[1]
+		inWidth = weight[2]
+		outWidth = weight[3]
 		if (groupWidth < 60):
 			groupWidth = 60
 		if (remarkWidth < 60):
 			remarkWidth = 90
+		if (inWidth < 180):
+			inWidth = 180
+		if (outWidth < 180):
+			outWidth = 180
 		otherWidth = 100
 
 		abema_logo = Image.open("./logos/abema.png")
@@ -143,19 +162,34 @@ class ExportResult(object):
 		tvb_logo.thumbnail((28,28))
 		youtube_logo = Image.open("./logos/YouTube.png")
 		youtube_logo.thumbnail((28,28))
-	
+
 		groupRightPosition = groupWidth
 		remarkRightPosition = groupRightPosition + remarkWidth
-		lossRightPosition = remarkRightPosition + otherWidth
-		tcpPingRightPosition = lossRightPosition + otherWidth
-		googlePingRightPosition = tcpPingRightPosition + otherWidth + 25
-		dspeedRightPosition = googlePingRightPosition + otherWidth
-		maxDSpeedRightPosition = dspeedRightPosition     
-		imageRightPosition = dspeedRightPosition
+		imageRightPosition = remarkRightPosition
+        
+		if not self.__hide_gping:
+			imageRightPosition = remarkRightPosition + otherWidth
+		lossRightPosition = imageRightPosition
+        
+		if not self.__hide_ping:
+			imageRightPosition = lossRightPosition + otherWidth
+		tcpPingRightPosition = imageRightPosition
 
-		if not self.__hide_max_speed:
-			imageRightPosition = maxDSpeedRightPosition + otherWidth 
-		maxDSpeedRightPosition = imageRightPosition              
+		if not self.__hide_gping:
+			imageRightPosition = tcpPingRightPosition + otherWidth + 25
+		googlePingRightPosition = imageRightPosition
+
+		if not self.__hide_port:
+			imageRightPosition = googlePingRightPosition + otherWidth
+		portRightPosition = imageRightPosition
+
+		if not self.__hide_speed:
+			imageRightPosition = portRightPosition + otherWidth
+		dspeedRightPosition = imageRightPosition
+
+		if not (self.__hide_max_speed or self.__hide_speed):
+			imageRightPosition = dspeedRightPosition + otherWidth
+		maxDSpeedRightPosition = imageRightPosition
 
 		if not self.__hide_ntt:
 			imageRightPosition = imageRightPosition + otherWidth + 80
@@ -166,8 +200,20 @@ class ExportResult(object):
 		netflix_right_position = imageRightPosition
 
 		if not self.__hide_stream:
-			imageRightPosition = imageRightPosition + otherWidth + 100
+			imageRightPosition = imageRightPosition + otherWidth + 160
 		stream_right_position = imageRightPosition
+
+		if not self.__hide_geoip:
+			imageRightPosition = imageRightPosition + inWidth
+		inbound_right_position = imageRightPosition
+
+		if not self.__hide_geoip:
+			imageRightPosition = imageRightPosition + outWidth
+		outbound_right_position = imageRightPosition
+
+		if not self.__hide_multiplex:
+			imageRightPosition = imageRightPosition + otherWidth + 10
+		multiplex_right_position = imageRightPosition
 
 		newImageHeight = imageHeight + 30 * 3
 		resultImg = Image.new("RGB",(imageRightPosition, newImageHeight),(255,255,255))
@@ -186,13 +232,23 @@ class ExportResult(object):
 		draw.line((1, 0, 1, newImageHeight - 1),fill=(127,127,127),width=1)
 		draw.line((groupRightPosition, 30, groupRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
 		draw.line((remarkRightPosition, 30, remarkRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
-		draw.line((lossRightPosition, 30, lossRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
-		draw.line((tcpPingRightPosition, 30, tcpPingRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
-		draw.line((googlePingRightPosition, 30, googlePingRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
-		draw.line((dspeedRightPosition, 30, dspeedRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
-        
-		if not self.__hide_max_speed:
-			draw.line((maxDSpeedRightPosition, 30, maxDSpeedRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_gping:
+			draw.line((lossRightPosition, 30, lossRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_ping:
+			draw.line((tcpPingRightPosition, 30, tcpPingRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_gping:
+			draw.line((googlePingRightPosition, 30, googlePingRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_port:
+			draw.line((portRightPosition, 30, portRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_speed:
+			draw.line((dspeedRightPosition, 30, dspeedRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+			if not self.__hide_max_speed:
+				draw.line((maxDSpeedRightPosition, 30, maxDSpeedRightPosition, imageHeight + 30 - 1),fill=(127,127,127),width=1)
         
 		if not self.__hide_ntt:
 			draw.line((ntt_right_position, 30, ntt_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)    
@@ -202,6 +258,15 @@ class ExportResult(object):
 
 		if not self.__hide_stream:
 			draw.line((stream_right_position, 30, stream_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_geoip:
+			draw.line((inbound_right_position, 30, inbound_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_geoip:
+			draw.line((outbound_right_position, 30, outbound_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_multiplex:
+			draw.line((multiplex_right_position, 30, multiplex_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
             
 		draw.line((imageRightPosition, 0, imageRightPosition, newImageHeight - 1),fill=(127,127,127),width=1)
 	
@@ -222,32 +287,44 @@ class ExportResult(object):
 			"Remarks", font=resultFont, fill=(0,0,0)
 		
 		)
-		draw.text(
-			(
-				remarkRightPosition + self.__getBasePos(lossRightPosition - remarkRightPosition, "Loss"), 30 + 4
-			),
-			"Loss", font=resultFont, fill=(0,0,0)
-		)
 
-		draw.text(
-			(
-				lossRightPosition + self.__getBasePos(tcpPingRightPosition - lossRightPosition, "Ping"), 30 + 4
-			),
-			"Ping", font=resultFont, fill=(0,0,0)
-		)
+		if not self.__hide_gping:
+			draw.text(
+				(
+					remarkRightPosition + self.__getBasePos(lossRightPosition - remarkRightPosition, "Loss"), 30 + 4
+				),
+				"Loss", font=resultFont, fill=(0,0,0)
+			)
 
-		draw.text(
-			(
-				tcpPingRightPosition + self.__getBasePos(googlePingRightPosition - tcpPingRightPosition, "Google Ping"), 30 + 4
-			),
-			"Google Ping", font=resultFont, fill=(0,0,0)
-		)
+		if not self.__hide_ping:
+			draw.text(
+				(
+					lossRightPosition + self.__getBasePos(tcpPingRightPosition - lossRightPosition, "Ping"), 30 + 4
+				),
+				"Ping", font=resultFont, fill=(0,0,0)
+			)
 
-		if not self.__hide_stspeed:
+		if not self.__hide_gping:
+			draw.text(
+				(
+					tcpPingRightPosition + self.__getBasePos(googlePingRightPosition - tcpPingRightPosition, "Google Ping"), 30 + 4
+				),
+				"Google Ping", font=resultFont, fill=(0,0,0)
+			)
+
+		if not self.__hide_port:
+			draw.text(
+				(
+					googlePingRightPosition + self.__getBasePos(portRightPosition - googlePingRightPosition, "Port"), 30 + 4
+				),
+				"Port", font=resultFont, fill=(0, 0, 0)
+			)
+
+		if not (self.__hide_stspeed or self.__hide_speed):
 			if(self.__test_method == "NETFLIX"):
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,"EndSpeed"),
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition,"EndSpeed"),
 						30 + 4
 					),
 					"EndSpeed", font=resultFont, fill=(0, 0, 0)
@@ -255,7 +332,7 @@ class ExportResult(object):
 			elif (self.__test_method == "YOUTUBE"):
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition,
 																	"StSpeed"),
 						30 + 4
 					),
@@ -264,15 +341,15 @@ class ExportResult(object):
 			else:
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "单线程"), 30 + 4
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition, "单线程"), 30 + 4
 					),
 					"单线程", font=resultFont, fill=(0,0,0)
 				)
-		else:
+		elif not self.__hide_speed:
 			if (self.__test_method == "NETFLIX"):
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition,
 																	"EndSpeed"),
 						30 + 4
 					),
@@ -281,7 +358,7 @@ class ExportResult(object):
 			elif (self.__test_method == "YOUTUBE"):
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition,
 																	"StSpeed"),
 						30 + 4
 					),
@@ -290,13 +367,13 @@ class ExportResult(object):
 			else:
 				draw.text(
 					(
-						googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition,"AvgSpeed"),
+						portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition,"AvgSpeed"),
 						30 + 4
 					),
 					"AvgSpeed", font=resultFont, fill=(0, 0, 0)
 				)
 
-		if not self.__hide_max_speed:
+		if not (self.__hide_max_speed or self.__hide_speed):
 			if not self.__hide_stspeed:
 				draw.text(
 					(
@@ -338,6 +415,33 @@ class ExportResult(object):
 			)
 		draw.line((0, 60, imageRightPosition - 1, 60),fill=(127,127,127),width=1)
 
+		if not self.__hide_geoip:
+			draw.text(
+				(
+					stream_right_position + self.__getBasePos(inbound_right_position - stream_right_position, "Inbound Geo"),
+					30 + 4
+				),
+				"Inbound Geo", font=resultFont, fill=(0, 0, 0)
+			)
+
+		if not self.__hide_geoip:
+			draw.text(
+				(
+					inbound_right_position + self.__getBasePos(outbound_right_position - inbound_right_position, "Outbound Geo"),
+					30 + 4
+				),
+				"Outbound Geo", font=resultFont, fill=(0, 0, 0)
+			)
+
+		if not self.__hide_multiplex:
+			draw.text(
+				(
+					outbound_right_position + self.__getBasePos(multiplex_right_position - outbound_right_position, "复用检测"),
+					30 + 4
+				),
+				"复用检测", font=resultFont, fill=(0, 0, 0)
+			)
+
 		totalTraffic = 0
 		onlineNode = 0
 		for i in range(0,len(result)):
@@ -355,29 +459,38 @@ class ExportResult(object):
 			remarks = item["remarks"]
 			draw.text((groupRightPosition + 5,30 * j + 30 + 4),remarks,font=resultFont,fill=(0,0,0,0))
 
-			loss = "%.2f" % (item["loss"] * 100) + "%"
-			pos = remarkRightPosition + self.__getBasePos(lossRightPosition - remarkRightPosition, loss)
-			draw.text((pos, 30 * j + 30 + 4),loss,font=resultFont,fill=(0,0,0))
+			if not self.__hide_gping:
+				loss = "%.2f" % (item["gPingLoss"] * 100) + "%"
+				pos = remarkRightPosition + self.__getBasePos(lossRightPosition - remarkRightPosition, loss)
+				draw.text((pos, 30 * j + 30 + 4),loss,font=resultFont,fill=(0,0,0))
 
-			ping = "%.2f" % (item["ping"] * 1000)
-			pos = lossRightPosition + self.__getBasePos(tcpPingRightPosition - lossRightPosition, ping)
-			draw.text((pos, 30 * j + 30 + 4),ping,font=resultFont,fill=(0,0,0))
+			if not self.__hide_ping:
+				ping = "%.2f" % (item["ping"] * 1000)
+				pos = lossRightPosition + self.__getBasePos(tcpPingRightPosition - lossRightPosition, ping)
+				draw.text((pos, 30 * j + 30 + 4),ping,font=resultFont,fill=(0,0,0))
 
-			gPing = "%.2f" % (item["gPing"] * 1000)
-			pos = tcpPingRightPosition + self.__getBasePos(googlePingRightPosition - tcpPingRightPosition, gPing)
-			draw.text((pos, 30 * j + 30 + 4),gPing,font=resultFont,fill=(0,0,0))
+			if not self.__hide_gping:
+				gPing = "%.2f" % (item["gPing"] * 1000)
+				pos = tcpPingRightPosition + self.__getBasePos(googlePingRightPosition - tcpPingRightPosition, gPing)
+				draw.text((pos, 30 * j + 30 + 4),gPing,font=resultFont,fill=(0,0,0))
 
-			speed = item["dspeed"]
-			if (speed == -1):
-				pos = googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, "N/A")
-				draw.text((pos, 30 * j + 30 + 1),"N/A",font=resultFont,fill=(0,0,0))
-			else:
-				draw.rectangle((googlePingRightPosition + 1,30 * j + 30 + 1,dspeedRightPosition - 1,30 * j + 60 -1),self.__getColor(speed))
-				speed = self.__parseSpeed(speed)
-				pos = googlePingRightPosition + self.__getBasePos(dspeedRightPosition - googlePingRightPosition, speed)
-				draw.text((pos, 30 * j + 30 + 1), speed,font=resultFont,fill=(0,0,0))
+			if not self.__hide_port:
+				port = "%d" % (item["port"])
+				pos = googlePingRightPosition + self.__getBasePos(portRightPosition - googlePingRightPosition, port)
+				draw.text((pos, 30 * j + 30 + 4), port, font=resultFont, fill=(0, 0, 0))
 
-			if not self.__hide_max_speed:
+			if not self.__hide_speed:
+				speed = item["dspeed"]
+				if (speed == -1):
+					pos = portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition, "N/A")
+					draw.text((pos, 30 * j + 30 + 1),"N/A",font=resultFont,fill=(0,0,0))
+				else:
+					draw.rectangle((portRightPosition + 1,30 * j + 30 + 1,dspeedRightPosition - 1,30 * j + 60 -1),self.__getColor(speed))
+					speed = self.__parseSpeed(speed)
+					pos = portRightPosition + self.__getBasePos(dspeedRightPosition - portRightPosition, speed)
+					draw.text((pos, 30 * j + 30 + 1), speed,font=resultFont,fill=(0,0,0))
+
+			if not (self.__hide_max_speed or self.__hide_speed):
 				maxSpeed = item["maxDSpeed"]
 				if (maxSpeed == -1):
 					pos = dspeedRightPosition + self.__getBasePos(maxDSpeedRightPosition - dspeedRightPosition, "N/A")
@@ -437,6 +550,44 @@ class ExportResult(object):
 				if tvb_type:
 					resultImg.paste(tvb_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
+
+			if not self.__hide_geoip:
+				inbound_geo = item["InRes"]
+				pos = stream_right_position + self.__getBasePos(inbound_right_position - stream_right_position, inbound_geo)
+				draw.text((pos, 30 * j + 30 + 1), inbound_geo,font=resultFont,fill=(0,0,0))
+
+			if not self.__hide_geoip:
+				outbound_geo = item["OutRes"]
+				pos = inbound_right_position + self.__getBasePos(outbound_right_position - inbound_right_position, outbound_geo)
+				draw.text((pos, 30 * j + 30 + 1), outbound_geo,font=resultFont,fill=(0,0,0))
+
+			if not self.__hide_geoip:
+				inbound_ip = item["InIP"]
+				outbound_ip = item["OutIP"]
+				if outbound_ip != "N/A":
+					inbound_mul = -1
+					outbound_mul = -1
+					if inbound_ip == "N/A":
+						inbound_mul = 0
+					for ip in range(0, len(result)):
+						ipitem = result[ip]
+						if (ipitem["InIP"] == inbound_ip and inbound_ip != "N/A"):
+							inbound_mul += 1
+						if (ipitem["OutIP"] == outbound_ip):
+							outbound_mul += 1
+					if inbound_mul and outbound_mul:
+						multiplex_res = "完全复用"
+					elif (not inbound_mul) and (not outbound_mul):
+						multiplex_res = "无复用"
+					elif inbound_mul:
+						multiplex_res = "中转复用"
+					elif outbound_mul:
+						multiplex_res = "落地复用"
+				else:
+					multiplex_res = "未知"
+
+				pos = outbound_right_position + self.__getBasePos(multiplex_right_position - outbound_right_position, multiplex_res)
+				draw.text((pos, 30 * j + 30 + 1), multiplex_res,font=resultFont,fill=(0,0,0))
                     
 		files = []
 		if (totalTraffic < 0):
@@ -444,16 +595,48 @@ class ExportResult(object):
 		else:
 			trafficUsed = self.__parseTraffic(totalTraffic)
 
+		if not self.__hide_speed:
+			t1 = "Traffic used : {}. ".format(trafficUsed)
+		else:
+			t1 = ""
+
+		if not self.__hide_gping:
+			t2 = " Online Node(s) : [{}/{}]".format(onlineNode,len(result))
+		else:
+			t2 = ""
+
+		with open(r'test.txt', 'a+', encoding='utf-8') as test:
+			test.seek(0, 0)
+			url = test.readline()
+			sum0 = int(test.readline())
+		os.remove(r'test.txt')
+
+		if not self.__hide_speed:
+			ClashUA = {
+				"User-Agent": "Clash"
+			}
+
+			try:
+				r = requests.get(url, headers=ClashUA, timeout=15)
+				t = r.headers["subscription-userinfo"]
+				dl = int(t[t.find("download") + 9:t.find("total") - 2])
+				sum = dl
+			except:
+				sum = 0
+			Avgrate = (sum - sum0) / totalTraffic
+			if (sum - sum0) > 0:
+				t3 = ".  AvgRate : {:.2f}".format(Avgrate)
+			else:
+				t3 = ""
+		else:
+			t3 = ""
+
 		draw.text((5, imageHeight + 30 + 4),
-			"Traffic used : {}. Time used: {}. Online Node(s) : [{}/{}]".format(
-				trafficUsed,
-				self.__timeUsed,
-				onlineNode,
-				len(result)
-			),
+			t1 + "Time used: {}.".format(self.__timeUsed,) + t2 + t3,
 			font=resultFont,
 			fill=(0,0,0)
 		)
+
 	#	draw.line((0,newImageHeight - 30 * 3 - 1,imageRightPosition,newImageHeight - 30 * 3 - 1),fill=(127,127,127),width=1)
 		draw.text((5,imageHeight + 30 * 2 + 4),
 			"测速频道：@Cheap_Proxy   Generated at {}".format(

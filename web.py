@@ -217,12 +217,12 @@ if (__name__ == "__main__"):
 		rc = RequirementsCheck()
 		rc.check()
 	else:
-		logger.warn("Requirements check skipped.")
+		logger.warning("Requirements check skipped.")
 
 	sc = SSRSpeedCore()
 	sc.webMode = True
 	if not os.path.exists(UPLOAD_FOLDER):
-		logger.warn("Upload folder {} not found, creating.".format(UPLOAD_FOLDER))
+		logger.warning("Upload folder {} not found, creating.".format(UPLOAD_FOLDER))
 		os.makedirs(UPLOAD_FOLDER)
 	app.run(host=options.listen,port=int(options.port),debug=DEBUG,threaded=True)
 

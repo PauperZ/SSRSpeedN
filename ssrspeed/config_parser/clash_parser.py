@@ -132,7 +132,7 @@ class ParserClash:
 
 	def parse_config(self, clash_cfg):
 		clash_cfg = yaml.load(clash_cfg, Loader=yaml.FullLoader)
-		for cfg in clash_cfg["Proxy"]:
+		for cfg in clash_cfg["proxies"]:
 			_type = cfg.get("type", "N/A").lower()
 			ret = None
 			if (_type == "ss"):

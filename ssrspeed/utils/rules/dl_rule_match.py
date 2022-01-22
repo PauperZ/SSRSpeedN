@@ -52,6 +52,7 @@ class DownloadRuleMatch:
 
 	def get_url(self, data: dict) -> str:
 		try:
+
 			if data and not self._config["skipRuleMatch"]:
 				return self._check_rule(data)
 			else:

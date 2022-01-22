@@ -36,6 +36,10 @@ ytype = False
 ttype = False
 atype = False
 btype = False
+inboundGeoRES = ""
+outboundGeoRES = ""
+inboundGeoIP = ""
+outboundGeoIP = ""
 
 class SpeedTest(object):
 	def __init__(self, parser, method = "SOCKET", use_ssr_cs = False):
@@ -84,6 +88,11 @@ class SpeedTest(object):
 			"Ttype": False,
 			"Atype": False,
 			"Btype": False,
+			"InRes":"N/A",
+			"OutRes":"N/A",
+			"InIP":"N/A",
+			"OutIP":"N/A",
+			"port": 0,
 		}
 
 	def __getBaseResult(self):
@@ -120,11 +129,18 @@ class SpeedTest(object):
 
 	def __geoIPInbound(self,config):
 		inboundIP = domain2ip(config["server"])
+		global inboundGeoIP
+		inboundGeoIP = inboundIP
 		inboundInfo = IPLoc(inboundIP)
 		inboundGeo = "{} {}, {}".format(
 			inboundInfo.get("country","N/A"),
 			inboundInfo.get("city","Unknown City"),
 			inboundInfo.get("organization","N/A")
+		)
+		global inboundGeoRES
+		inboundGeoRES = "{}, {}".format(
+			inboundInfo.get("city","Unknown City"),
+			inboundInfo.get("organization", "N/A")
 		)
 		logger.info(
 			"Node inbound IP : {}, Geo : {}".format(
@@ -137,10 +153,17 @@ class SpeedTest(object):
 	def __geoIPOutbound(self):
 		outboundInfo = IPLoc()
 		outboundIP = outboundInfo.get("ip","N/A")
+		global outboundGeoIP
+		outboundGeoIP = outboundIP
 		outboundGeo = "{} {}, {}".format(
 			outboundInfo.get("country","N/A"),
 			outboundInfo.get("city","Unknown City"),
 			outboundInfo.get("organization","N/A")
+		)
+		global outboundGeoRES
+		outboundGeoRES = "{}, {}".format(
+			outboundInfo.get("country_code", "N/A"),
+			outboundInfo.get("organization", "N/A")
 		)
 		logger.info(
 			"Node outbound IP : {}, Geo : {}".format(
@@ -219,12 +242,17 @@ class SpeedTest(object):
 				headers = {
 					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
 				global dtype
-				r = requests.get("https://www.disneyplus.com/", proxies={
+				r1 = requests.get("https://www.disneyplus.com/", proxies={
 					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
 					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
 				}, timeout=20, allow_redirects=False)
 
-				if (r.status_code == 200):
+				r2 = requests.get("https://global.edge.bamgrid.com/token", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=20, allow_redirects=False)
+
+				if (r1.status_code == 200 and r2.status_code != 403):
 					dtype = True
 				else:
 					dtype = False
@@ -332,6 +360,7 @@ class SpeedTest(object):
 		if ((not PING_TEST) or (latencyTest[0] > 0)):
 			if GOOGLE_PING_TEST:
 				try:
+					st = SpeedTestMethods()
 					googlePingTest = st.googlePing()
 					res["gPing"] = googlePingTest[0]
 					res["gPingLoss"] = 1 - googlePingTest[1]
@@ -389,6 +418,7 @@ class SpeedTest(object):
 				_item["remarks"] = cfg["remarks"]
 				self.__current = _item
 				cfg["server_port"] = int(cfg["server_port"])
+				_item["port"] = cfg["server_port"]
 				client.startClient(cfg)
 
 				# Check client started
@@ -512,6 +542,10 @@ class SpeedTest(object):
 						global ttype
 						global atype
 						global btype
+						global inboundGeoRES
+						global outboundGeoRES
+						global inboundGeoIP
+						global outboundGeoIP
 						_item["dspeed"] = testRes[0]
 						_item["maxDSpeed"] = testRes[1]
 						_item["Ntype"] = ntype
@@ -521,6 +555,10 @@ class SpeedTest(object):
 						_item["Ttype"] = ttype
 						_item["Atype"] = atype
 						_item["Btype"] = btype
+						_item["InRes"] = inboundGeoRES
+						_item["OutRes"] = outboundGeoRES
+						_item["InIP"] = inboundGeoIP
+						_item["OutIP"] = outboundGeoIP
 						try:
 							_item["trafficUsed"] = testRes[3]
 							_item["rawSocketSpeed"] = testRes[2]

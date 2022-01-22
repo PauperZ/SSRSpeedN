@@ -118,6 +118,7 @@ class UniversalParser:
 				else:
 					gen_cfg = V2RayBaseConfigs.generate_config(cfg, LOCAL_ADDRESS, LOCAL_PORT)
 					node = NodeV2Ray(gen_cfg)
+
 			else:
 				logger.warn(f"Unsupport link: {link}")
 
@@ -174,6 +175,23 @@ class UniversalParser:
 				"User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
 			}
 			logger.info("Reading {}".format(url))
+
+			ClashUA = {
+        		"User-Agent": "Clash"
+    		}
+
+			try:
+				r = requests.get(url, headers=ClashUA, timeout=15)
+				t = r.headers["subscription-userinfo"]
+				dl = int(t[t.find("download") + 9:t.find("total") - 2])
+				sum = dl
+			except:
+				sum = 0
+
+			with open(r'test.txt', 'a+', encoding='utf-8') as test:
+				test.write('{}\n'.format(url))
+				test.write('{}\n'.format(sum))
+
 			if PROXY_SETTINGS["enabled"]:
 				auth = ""
 				if PROXY_SETTINGS["username"]:
@@ -222,6 +240,7 @@ class UniversalParser:
 
 			#Try Clash Parser
 			self.__nodes.extend(self.__parse_clash(rep))
+
 
 	def read_gui_config(self, filename: str):
 		raw_data = ""
