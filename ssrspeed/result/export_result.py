@@ -34,6 +34,7 @@ class ExportResult(object):
 		self.__hide_max_speed = config["exportResult"]["hide_max_speed"]
 		self.__hide_ntt = not config["ntt"]["enabled"]
 		self.__hide_netflix = not config["netflix"]
+		self.__hide_abema = not config["abema"]
 		self.__hide_stream = not config["stream"]
 		self.__hide_stspeed = not config["StSpeed"]
 		self.__test_method = not config["method"]
@@ -199,6 +200,10 @@ class ExportResult(object):
 			imageRightPosition = imageRightPosition + otherWidth + 60
 		netflix_right_position = imageRightPosition
 
+		if not self.__hide_abema:
+			imageRightPosition = imageRightPosition + otherWidth + 60
+		abema_right_position = imageRightPosition
+
 		if not self.__hide_stream:
 			imageRightPosition = imageRightPosition + otherWidth + 160
 		stream_right_position = imageRightPosition
@@ -255,6 +260,9 @@ class ExportResult(object):
 
 		if not self.__hide_netflix:
 			draw.line((netflix_right_position, 30, netflix_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_abema:
+			draw.line((abema_right_position, 30, abema_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
 
 		if not self.__hide_stream:
 			draw.line((stream_right_position, 30, stream_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
@@ -406,10 +414,18 @@ class ExportResult(object):
 				"Netfilx 解锁", font=resultFont, fill=(0,0,0)
 			)
 
+		if not self.__hide_abema:
+			draw.text(
+				(
+					netflix_right_position + self.__getBasePos(abema_right_position - netflix_right_position, "Abema 解锁"), 30 + 4
+					),
+				"Abema 解锁", font=resultFont, fill=(0,0,0)
+			)
+
 		if not self.__hide_stream:
 			draw.text(
 				(
-					netflix_right_position + self.__getBasePos(stream_right_position - netflix_right_position, "流媒体解锁"), 30 + 4
+					abema_right_position + self.__getBasePos(stream_right_position - abema_right_position, "流媒体解锁"), 30 + 4
 					),
 				"流媒体解锁", font=resultFont, fill=(0,0,0)
 			)
@@ -515,6 +531,11 @@ class ExportResult(object):
 				pos = ntt_right_position + self.__getBasePos(netflix_right_position - ntt_right_position, netflix_type)
 				draw.text((pos, 30 * j + 30 + 1), netflix_type,font=resultFont,fill=(0,0,0))
 
+			if not self.__hide_abema:
+				abema_type = item["Atype"]
+				pos = netflix_right_position + self.__getBasePos(abema_right_position - netflix_right_position, abema_type)
+				draw.text((pos, 30 * j + 30 + 1), abema_type,font=resultFont,fill=(0,0,0))
+
 			if not self.__hide_stream:
 				netflix_type = item["Ntype"]
 				hbo_type = item["Htype"]
@@ -527,8 +548,12 @@ class ExportResult(object):
 					n_type = True
 				else:
 					n_type = False
-				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type
-				pos = netflix_right_position + (stream_right_position - netflix_right_position - sums * 35) / 2
+				if(abema_type == "App Only" or abema_type == "App & Web"):
+					a_type = True
+				else:
+					a_type = False
+				sums = n_type + hbo_type + disney_type + youtube_type + a_type + bahamut_type + tvb_type
+				pos = abema_right_position + (stream_right_position - abema_right_position - sums * 35) / 2
 				if n_type:
 					resultImg.paste(netflix_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35

@@ -34,7 +34,7 @@ htype = False
 dtype = False
 ytype = False
 ttype = False
-atype = False
+atype = "None"
 btype = False
 inboundGeoRES = ""
 outboundGeoRES = ""
@@ -271,7 +271,9 @@ class SpeedTest(object):
 					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
 				}, timeout=20, allow_redirects=False)
 
-				if (r.status_code == 200):
+				if ("is not available" in r.text):
+					ytype = False
+				elif (r.status_code == 200):
 					ytype = True
 				else:
 					ytype = False
@@ -309,11 +311,19 @@ class SpeedTest(object):
 					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
 				}, timeout=20, allow_redirects=False)
 
-				if (r.text.count("Country") > 0):
-					atype = True
+				if (r.text.count("Country") == 0):
+					atype = "None"
 				else:
-					atype = False
-
+					r = requests.get("https://abematv.akamaized.net/region", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+					}, timeout=20, allow_redirects=False)
+				
+					if ("OK" in r.text):
+						atype = "App & Web"
+					else:
+						atype = "App Only"
+					
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
