@@ -86,7 +86,7 @@ class SpeedTest(object):
 			"Dtype": False,
 			"Ytype": False,
 			"Ttype": False,
-			"Atype": False,
+			"Atype": "N/A",
 			"Btype": False,
 			"InRes":"N/A",
 			"OutRes":"N/A",

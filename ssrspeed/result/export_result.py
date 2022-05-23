@@ -566,7 +566,7 @@ class ExportResult(object):
 				if youtube_type:
 					resultImg.paste(youtube_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
-				if abema_type:
+				if a_type:
 					resultImg.paste(abema_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
 				if bahamut_type:
