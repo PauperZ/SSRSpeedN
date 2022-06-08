@@ -271,8 +271,10 @@ class SpeedTest(object):
 					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
 				}, timeout=20, allow_redirects=False)
 
-				if (r.status_code == 200):
-					ytype = True
+				if ("is not available" in r.text):
+					ytype = False
+				elif (r.status_code == 200):
+					ytype = True			
 				else:
 					ytype = False
 
