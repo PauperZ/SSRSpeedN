@@ -226,7 +226,7 @@ class ExportResult(object):
 
 		
 	#	draw.line((0,newImageHeight - 30 - 1,imageRightPosition,newImageHeight - 30 - 1),fill=(127,127,127),width=1)
-		text = "机场测速 With SSRSpeed N ( v{} ) by @it_newbie 微调".format(config["VERSION"])
+		text = "便宜机场测速 With SSRSpeed N ( v{} )".format(config["VERSION"])
 		draw.text((self.__getBasePos(imageRightPosition, text), 4),
 			text,
 			font=resultFont,
@@ -669,7 +669,7 @@ class ExportResult(object):
 
 	#	draw.line((0,newImageHeight - 30 * 3 - 1,imageRightPosition,newImageHeight - 30 * 3 - 1),fill=(127,127,127),width=1)
 		draw.text((5,imageHeight + 30 * 2 + 4),
-			"测速频道：@it_newbie   Generated at {}".format(
+			"测速频道：@Cheap_Proxy   Generated at {}".format(
 				time.strftime("%Y-%m-%d %H:%M:%S", generatedTime)
 			),
 			font=resultFont,
