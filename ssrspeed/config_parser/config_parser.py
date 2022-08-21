@@ -7,13 +7,14 @@ import logging
 import requests
 
 from ..utils import b64plus
-from ..types.nodes import NodeShadowsocks, NodeShadowsocksR, NodeV2Ray
+from ..types.nodes import NodeShadowsocks, NodeShadowsocksR, NodeV2Ray,NodeTrojan
 from .base_configs import shadowsocks_get_config, V2RayBaseConfigs
 from .shadowsocks_parsers import ParserShadowsocksBasic, ParserShadowsocksSIP002, ParserShadowsocksD
 from .shadowsocksr_parsers import ParserShadowsocksR
 from .v2ray_parsers import ParserV2RayN, ParserV2RayQuantumult
 from .clash_parser import ParserClash
 from .node_filters import NodeFilter
+from .trojan_parser import TrojanParser
 
 from config import config
 PROXY_SETTINGS = config["proxy"]
@@ -118,7 +119,17 @@ class UniversalParser:
 				else:
 					gen_cfg = V2RayBaseConfigs.generate_config(cfg, LOCAL_ADDRESS, LOCAL_PORT)
 					node = NodeV2Ray(gen_cfg)
-
+			elif link[:9] == "trojan://":
+				cfg = None
+				logger.info("Try Trojan Parser.")
+				pvTrojan = TrojanParser()
+				try:
+					cfg = pvTrojan._parseLink(link)
+					# logger.info(cfg)
+				except ValueError:
+					pass
+				if cfg:
+					node = NodeTrojan(cfg)
 			else:
 				logger.warn(f"Unsupport link: {link}")
 
@@ -141,6 +152,8 @@ class UniversalParser:
 						V2RayBaseConfigs.generate_config(cfg["config"], LOCAL_ADDRESS, LOCAL_PORT)
 					)
 				)
+			elif cfg["type"]=="trojan":
+				result.append(NodeTrojan(cfg["config"]))
 
 		return result
 	
@@ -166,7 +179,8 @@ class UniversalParser:
 			if (
 				url.startswith("ss://") or
 				url.startswith("ssr://") or
-				url.startswith("vmess://")
+				url.startswith("vmess://") or
+				url.startswith("trojan://")
 			):
 				self.__nodes.extend(self.parse_links([url]))
 				continue

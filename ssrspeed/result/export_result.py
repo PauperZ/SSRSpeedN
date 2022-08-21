@@ -34,6 +34,7 @@ class ExportResult(object):
 		self.__hide_max_speed = config["exportResult"]["hide_max_speed"]
 		self.__hide_ntt = not config["ntt"]["enabled"]
 		self.__hide_netflix = not config["netflix"]
+		self.__hide_bilibili = not config["bilibili"]
 		self.__hide_stream = not config["stream"]
 		self.__hide_stspeed = not config["StSpeed"]
 		self.__test_method = not config["method"]
@@ -162,7 +163,8 @@ class ExportResult(object):
 		tvb_logo.thumbnail((28,28))
 		youtube_logo = Image.open("./logos/YouTube.png")
 		youtube_logo.thumbnail((28,28))
-
+		bilibili_logo = Image.open("./logos/bilibili.png")
+		bilibili_logo.thumbnail((28,28))
 		groupRightPosition = groupWidth
 		remarkRightPosition = groupRightPosition + remarkWidth
 		imageRightPosition = remarkRightPosition
@@ -198,6 +200,9 @@ class ExportResult(object):
 		if not self.__hide_netflix:
 			imageRightPosition = imageRightPosition + otherWidth + 60
 		netflix_right_position = imageRightPosition
+		if not self.__hide_bilibili:
+			imageRightPosition = imageRightPosition + otherWidth + 60
+		bilibili_right_position = imageRightPosition
 
 		if not self.__hide_stream:
 			imageRightPosition = imageRightPosition + otherWidth + 160
@@ -221,7 +226,7 @@ class ExportResult(object):
 
 		
 	#	draw.line((0,newImageHeight - 30 - 1,imageRightPosition,newImageHeight - 30 - 1),fill=(127,127,127),width=1)
-		text = "便宜机场测速 With SSRSpeed N ( v{} )".format(config["VERSION"])
+		text = "机场测速 With SSRSpeed N ( v{} ) by @it_newbie 微调".format(config["VERSION"])
 		draw.text((self.__getBasePos(imageRightPosition, text), 4),
 			text,
 			font=resultFont,
@@ -255,6 +260,9 @@ class ExportResult(object):
 
 		if not self.__hide_netflix:
 			draw.line((netflix_right_position, 30, netflix_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
+
+		if not self.__hide_bilibili:
+			draw.line((bilibili_right_position, 30, bilibili_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
 
 		if not self.__hide_stream:
 			draw.line((stream_right_position, 30, stream_right_position, imageHeight + 30 - 1),fill=(127,127,127),width=1)
@@ -405,11 +413,17 @@ class ExportResult(object):
 					),
 				"Netfilx 解锁", font=resultFont, fill=(0,0,0)
 			)
-
+		if not self.__hide_bilibili:
+			draw.text(
+				(
+					netflix_right_position + self.__getBasePos(bilibili_right_position - netflix_right_position, "Netfilx 解锁"), 30 + 4
+					),
+				"Bilibili 解锁", font=resultFont, fill=(0,0,0)
+			)
 		if not self.__hide_stream:
 			draw.text(
 				(
-					netflix_right_position + self.__getBasePos(stream_right_position - netflix_right_position, "流媒体解锁"), 30 + 4
+					bilibili_right_position + self.__getBasePos(stream_right_position - bilibili_right_position, "流媒体解锁"), 30 + 4
 					),
 				"流媒体解锁", font=resultFont, fill=(0,0,0)
 			)
@@ -515,6 +529,11 @@ class ExportResult(object):
 				pos = ntt_right_position + self.__getBasePos(netflix_right_position - ntt_right_position, netflix_type)
 				draw.text((pos, 30 * j + 30 + 1), netflix_type,font=resultFont,fill=(0,0,0))
 
+			if not self.__hide_bilibili:
+				bilibili_type = item["Bltype"]
+				pos = netflix_right_position + self.__getBasePos(bilibili_right_position - netflix_right_position, bilibili_type)
+				draw.text((pos, 30 * j + 30 + 1), bilibili_type,font=resultFont,fill=(0,0,0))
+
 			if not self.__hide_stream:
 				netflix_type = item["Ntype"]
 				hbo_type = item["Htype"]
@@ -522,13 +541,18 @@ class ExportResult(object):
 				youtube_type = item["Ytype"]
 				abema_type = item["Atype"]
 				bahamut_type = item["Btype"]
+				bilibili_type = item["Bltype"]
 				tvb_type = item["Ttype"]
-				if(netflix_type == "Full Native" or netflix_type == "Full DNS"):
+				if(netflix_type[:4] == "Full"):
 					n_type = True
 				else:
 					n_type = False
-				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type
-				pos = netflix_right_position + (stream_right_position - netflix_right_position - sums * 35) / 2
+				if(bilibili_type == "N/A"):
+					bl_type = False
+				else:
+					bl_type = True
+				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type + bl_type
+				pos = bilibili_right_position + (stream_right_position - bilibili_right_position - sums * 35) / 2
 				if n_type:
 					resultImg.paste(netflix_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
@@ -549,6 +573,9 @@ class ExportResult(object):
 					pos += 35
 				if tvb_type:
 					resultImg.paste(tvb_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if bl_type:
+					resultImg.paste(bilibili_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
 
 			if not self.__hide_geoip:
@@ -623,7 +650,10 @@ class ExportResult(object):
 				sum = dl
 			except:
 				sum = 0
-			Avgrate = (sum - sum0) / totalTraffic
+			if totalTraffic > 0:
+				Avgrate = (sum - sum0) / totalTraffic
+			else :
+				Avgrate = 0
 			if (sum - sum0) > 0:
 				t3 = ".  AvgRate : {:.2f}".format(Avgrate)
 			else:
@@ -639,7 +669,7 @@ class ExportResult(object):
 
 	#	draw.line((0,newImageHeight - 30 * 3 - 1,imageRightPosition,newImageHeight - 30 * 3 - 1),fill=(127,127,127),width=1)
 		draw.text((5,imageHeight + 30 * 2 + 4),
-			"测速频道：@Cheap_Proxy   Generated at {}".format(
+			"测速频道：@it_newbie   Generated at {}".format(
 				time.strftime("%Y-%m-%d %H:%M:%S", generatedTime)
 			),
 			font=resultFont,
