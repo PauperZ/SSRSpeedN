@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger("Sub")
 
 from .test_methods import SpeedTestMethods
-from ..client_launcher import ShadowsocksClient, ShadowsocksRClient, V2RayClient
+from ..client_launcher import ShadowsocksClient, ShadowsocksRClient, V2RayClient,TrojanClient
 from ..utils.geo_ip import domain2ip, parseLocation, IPLoc
 from ..utils.port_checker import check_port
 
@@ -29,6 +29,7 @@ YOUTUBE_TEXT = config["youtube"]
 TVB_TEXT = config["tvb"]
 ABEMA_TEXT = config["abema"]
 BAHAMUT_TEXT = config["bahamut"]
+BILIBILI_TEXT = config["bilibili"]
 ntype = "None"
 htype = False
 dtype = False
@@ -36,6 +37,7 @@ ytype = False
 ttype = False
 atype = False
 btype = False
+bltype = "N/A"
 inboundGeoRES = ""
 outboundGeoRES = ""
 inboundGeoIP = ""
@@ -81,13 +83,14 @@ class SpeedTest(object):
 				"public_ip": "",
 				"public_port": 0
 			},
-            "Ntype": "N/A",
+            "Ntype": "None",
 			"Htype": False,
 			"Dtype": False,
 			"Ytype": False,
 			"Ttype": False,
 			"Atype": False,
 			"Btype": False,
+			"Bltype":"N/A",
 			"InRes":"N/A",
 			"OutRes":"N/A",
 			"InIP":"N/A",
@@ -114,6 +117,8 @@ class SpeedTest(object):
 			return client
 		elif client_type == "V2Ray":
 			return V2RayClient()
+		elif client_type == "Trojan":
+			return TrojanClient()
 		else:
 			return None
 
@@ -197,8 +202,10 @@ class SpeedTest(object):
 					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
 					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
 				}, timeout=20)
+				rg=""
 				if (r2.status_code == 200):
 					sum += 1
+					rg = "("+r2.url.split("com/")[1].split("/")[0]+")"
 				# 测试连接状态
 
 				if (sum == 0):
@@ -209,10 +216,10 @@ class SpeedTest(object):
 					ntype = "Only Original"
 				elif (outboundIP == netflix_ip):
 					logger.info("Netflix test result: Full Native.")
-					ntype = "Full Native"
+					ntype = "Full Native"+rg
 				else:
 					logger.info("Netflix test result: Full DNS.")
-					ntype = "Full DNS"
+					ntype = "Full DNS"+rg
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
@@ -337,7 +344,33 @@ class SpeedTest(object):
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
+		
+		if BILIBILI_TEXT and outboundIP != "N/A":
+			logger.info("Performing Bilibili test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				global bltype
+				r1 = requests.get("https://api.bilibili.com/pgc/player/web/playurl?avid=18281381&cid=29892777&qn=0&type=&otype=json&ep_id=183799&fourk=1&fnver=0&fnval=16", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=20, allow_redirects=False)
+				r1_code = r1.status_code 
+				r2 =  requests.get("https://api.bilibili.com/pgc/player/web/playurl?avid=50762638&cid=100279344&qn=0&type=&otype=json&ep_id=268176&fourk=1&fnver=0&fnval=16", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=20, allow_redirects=False)
+				r2_code = r2.status_code 
+				if (r1_code == 200):
+					bltype = "港澳台"
+				elif (r2_code == 200):
+					bltype = "台湾"
+				else:
+					bltype = "N/A"
 
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+			#
 		return (outboundIP, outboundGeo, outboundInfo.get("country_code", "N/A"))
 
 	def __tcpPing(self, server, port):
@@ -544,6 +577,7 @@ class SpeedTest(object):
 						global ttype
 						global atype
 						global btype
+						global bltype
 						global inboundGeoRES
 						global outboundGeoRES
 						global inboundGeoIP
@@ -557,6 +591,7 @@ class SpeedTest(object):
 						_item["Ttype"] = ttype
 						_item["Atype"] = atype
 						_item["Btype"] = btype
+						_item["Bltype"] = bltype
 						_item["InRes"] = inboundGeoRES
 						_item["OutRes"] = outboundGeoRES
 						_item["InIP"] = inboundGeoIP
