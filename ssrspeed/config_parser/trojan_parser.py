@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from urllib.parse import quote, unquote
+from urllib.parse import quote, unquote, parse_qsl
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 import re
 import logging
@@ -83,7 +83,7 @@ class TrojanParser(BaseParser):
 		password = ""
 		if "@" in link:
 			password, link = link.split("@")
-		result["password"].append(password)
+		result["password"][0] = password
 
 		if "?" in link:
 			host,link = link.split("?")
@@ -94,15 +94,12 @@ class TrojanParser(BaseParser):
 		result["remote_port"] = result["server_port"]
 
 		if link:
-			link_args = dict(str.lower(x).split("=") for x in link.split("&"))
-			if "allowinsecure" in link_args:
-				result["ssl"]["verify"] = link_args["allowinsecure"] == "1"
-			if "sni" in link_args:
-				result["ssl"]["sni"] = link_args["sni"]
-			if "tfo" in link_args:
-				result["tcp"]["fast_open"] = link_args["tfo"] == "1"
-			if "peer" in link_args:
-				result["group"] = link_args["peer"]
+			link_args = dict(parse_qsl(link))
+			result["ssl"]["verify"] = link_args.get("allowinsecure", "") == "1"
+			logger.info(link_args.get("allowinsecure", ""))
+			result["ssl"]["sni"] = link_args.get("sni", "")
+			result["tcp"]["fast_open"] = link_args.get("tfo", "") == "1"
+			result["group"] = link_args.get("peer", "N/A")
 			#ws 协议 必传host 与 path
 			if "type" in link_args and link_args["type"] == "ws" and "host" in link_args and "path" in link_args:
 				result["websocket"]["enabled"] = "true"

@@ -99,6 +99,34 @@ class ExportResult(object):
 			lenIn = max(lenIn, draw.textsize(inres, font=font)[0])
 			lenOut = max(lenOut, draw.textsize(outres, font=font)[0])
 		return (maxGroupWidth + 10,maxRemarkWidth + 10,lenIn + 20,lenOut + 20)
+
+	def __getMaxWidthStream(self,result):
+		maxStreamWidth = 0
+		for item in result:
+			netflix_type = item["Ntype"]
+			hbo_type = item["Htype"]
+			disney_type = item["Dtype"]
+			youtube_type = item["Ytype"]
+			abema_type = item["Atype"]
+			bahamut_type = item["Btype"]
+			chatgpt_type = item["Ctype"]
+			bilibili_type = item["Bltype"]
+			tvb_type = item["Ttype"]
+			if (netflix_type[:4] == "Full"):
+				n_type = True
+			else:
+				n_type = False
+			if (bilibili_type == "全解锁"):
+				bl_type = True
+			else:
+				bl_type = False
+			sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type + bl_type + chatgpt_type
+			tmpWidth = sums * 35 + 20
+
+			if tmpWidth > maxStreamWidth:
+				maxStreamWidth = tmpWidth
+
+		return maxStreamWidth
 	
 	'''
 	def __deweighting(self,result):
@@ -135,6 +163,7 @@ class ExportResult(object):
 		generatedTime = time.localtime()
 		imageHeight = len(result) * 30 + 30 
 		weight = self.__getMaxWidth(result)
+		streamWeight = self.__getMaxWidthStream(result)
 		groupWidth = weight[0]
 		remarkWidth = weight[1]
 		inWidth = weight[2]
@@ -147,6 +176,8 @@ class ExportResult(object):
 			inWidth = 180
 		if (outWidth < 180):
 			outWidth = 180
+		if streamWeight < 120:
+			streamWeight = 120
 		otherWidth = 100
 
 		abema_logo = Image.open("./logos/abema.png")
@@ -165,6 +196,8 @@ class ExportResult(object):
 		youtube_logo.thumbnail((28,28))
 		bilibili_logo = Image.open("./logos/bilibili.png")
 		bilibili_logo.thumbnail((28,28))
+		chatgpt_logo = Image.open("./logos/chatgpt.png")
+		chatgpt_logo.thumbnail((28, 28))
 		groupRightPosition = groupWidth
 		remarkRightPosition = groupRightPosition + remarkWidth
 		imageRightPosition = remarkRightPosition
@@ -200,12 +233,13 @@ class ExportResult(object):
 		if not self.__hide_netflix:
 			imageRightPosition = imageRightPosition + otherWidth + 60
 		netflix_right_position = imageRightPosition
+
 		if not self.__hide_bilibili:
-			imageRightPosition = imageRightPosition + otherWidth + 60
+			imageRightPosition = imageRightPosition + otherWidth + 45
 		bilibili_right_position = imageRightPosition
 
 		if not self.__hide_stream:
-			imageRightPosition = imageRightPosition + otherWidth + 160
+			imageRightPosition = imageRightPosition + streamWeight
 		stream_right_position = imageRightPosition
 
 		if not self.__hide_geoip:
@@ -541,18 +575,19 @@ class ExportResult(object):
 				youtube_type = item["Ytype"]
 				abema_type = item["Atype"]
 				bahamut_type = item["Btype"]
+				chatgpt_type = item["Ctype"]
 				bilibili_type = item["Bltype"]
 				tvb_type = item["Ttype"]
 				if(netflix_type[:4] == "Full"):
 					n_type = True
 				else:
 					n_type = False
-				if(bilibili_type == "N/A"):
-					bl_type = False
-				else:
+				if(bilibili_type == "全解锁"):
 					bl_type = True
-				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type + bl_type
-				pos = bilibili_right_position + (stream_right_position - bilibili_right_position - sums * 35) / 2
+				else:
+					bl_type = False
+				sums = n_type + hbo_type + disney_type + youtube_type + abema_type + bahamut_type + tvb_type + bl_type + chatgpt_type
+				pos = bilibili_right_position + (stream_right_position - bilibili_right_position - sums * 35) / 2 + 3
 				if n_type:
 					resultImg.paste(netflix_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
@@ -576,6 +611,9 @@ class ExportResult(object):
 					pos += 35
 				if bl_type:
 					resultImg.paste(bilibili_logo, (int(pos), 30 * j + 30 + 1))
+					pos += 35
+				if chatgpt_type:
+					resultImg.paste(chatgpt_logo, (int(pos), 30 * j + 30 + 1))
 					pos += 35
 
 			if not self.__hide_geoip:
@@ -652,7 +690,7 @@ class ExportResult(object):
 				sum = 0
 			if totalTraffic > 0:
 				Avgrate = (sum - sum0) / totalTraffic
-			else :
+			else:
 				Avgrate = 0
 			if (sum - sum0) > 0:
 				t3 = ".  AvgRate : {:.2f}".format(Avgrate)

@@ -1,3 +1,4 @@
+six
 pillow
 requests
 requests[socks]

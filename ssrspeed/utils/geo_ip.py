@@ -72,7 +72,7 @@ def IPLoc(ip = ""):
 		rep = requests.get("https://api.ip.sb/geoip/{}".format(ip),proxies = {
 			"http":"socks5h://127.0.0.1:%d" % LOCAL_PORT,
 			"https":"socks5h://127.0.0.1:%d" % LOCAL_PORT
-		},timeout=5,headers=headers)
+		}, timeout=5, headers=headers)
 		tmp = rep.json()
 		return tmp
 	except requests.exceptions.ReadTimeout:

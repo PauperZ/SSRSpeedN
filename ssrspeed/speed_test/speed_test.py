@@ -5,8 +5,10 @@ import copy
 import socket
 import socks
 import time
+import json
 import pynat
 import requests
+import concurrent.futures
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger("Sub")
@@ -22,14 +24,15 @@ LOCAL_ADDRESS = config["localAddress"]
 LOCAL_PORT = config["localPort"]
 PING_TEST = config["ping"]
 GOOGLE_PING_TEST = config["gping"]
-NETFLIX_TEXT = config["netflix"]
-HBO_TEXT = config["hbo"]
-DISNEY_TEXT = config["disney"]
-YOUTUBE_TEXT = config["youtube"]
-TVB_TEXT = config["tvb"]
-ABEMA_TEXT = config["abema"]
-BAHAMUT_TEXT = config["bahamut"]
-BILIBILI_TEXT = config["bilibili"]
+NETFLIX_TEST = config["netflix"]
+HBO_TEST = config["hbo"]
+DISNEY_TEST = config["disney"]
+YOUTUBE_TEST = config["youtube"]
+TVB_TEST = config["tvb"]
+ABEMA_TEST = config["abema"]
+BAHAMUT_TEST = config["bahamut"]
+BILIBILI_TEST = config["bilibili"]
+CHATGPT_TEST = config["chatgpt"]
 ntype = "None"
 htype = False
 dtype = False
@@ -37,6 +40,7 @@ ytype = False
 ttype = False
 atype = False
 btype = False
+ctype = False
 bltype = "N/A"
 inboundGeoRES = ""
 outboundGeoRES = ""
@@ -90,6 +94,7 @@ class SpeedTest(object):
 			"Ttype": False,
 			"Atype": False,
 			"Btype": False,
+			"Ctype": False,
 			"Bltype":"N/A",
 			"InRes":"N/A",
 			"OutRes":"N/A",
@@ -131,6 +136,29 @@ class SpeedTest(object):
 	
 	def getCurrent(self):
 		return self.__current
+
+	def getResponse(self, url):
+		response = 0
+		try:
+			if type(url) == type(""):
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+				response = requests.get(url, proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=8)
+			else:
+				headers = {
+					"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"}
+				response = requests.get(url[0], proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=8, cookies=url[1])
+
+		except Exception as e:
+			logger.error('代理服务器连接异常：' + str(e.args))
+
+		return response
 
 	def __geoIPInbound(self,config):
 		inboundIP = domain2ip(config["server"])
@@ -177,201 +205,270 @@ class SpeedTest(object):
 			)
 		)
 
-		if NETFLIX_TEXT and outboundIP != "N/A":
-			logger.info("Performing netflix test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+		urls = []
+		global ntype
+		global htype
+		global dtype
+		global ytype
+		global ttype
+		global atype
+		global btype
+		global ctype
+		global bltype
+
+		ntype = "None"
+		htype = False
+		dtype = False
+		ytype = False
+		ttype = False
+		atype = False
+		btype = False
+		ctype = False
+		bltype = "N/A"
+
+		if NETFLIX_TEST and outboundIP != "N/A":
+			urls.append("https://www.netflix.com/title/70242311")
+			urls.append("https://www.netflix.com/title/70143836")
+
+		if HBO_TEST and outboundIP != "N/A":
+			urls.append("https://www.hbomax.com/")
+
+		if DISNEY_TEST and outboundIP != "N/A":
+			urls.append("https://www.disneyplus.com/")
+			urls.append("https://global.edge.bamgrid.com/token")
+
+		if YOUTUBE_TEST and outboundIP != "N/A":
+			urls.append("https://music.youtube.com/")
+
+		if TVB_TEST and outboundIP != "N/A":
+			urls.append("https://www.mytvsuper.com/api/auth/getSession/self/")
+
+		if ABEMA_TEST and outboundIP != "N/A":
+			urls.append("https://api.abema.io/v1/ip/check?device=android")
+
+		if BAHAMUT_TEST and outboundIP != "N/A":
+			BAHAMUT_CODE = 1
 			try:
 				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
+					"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"}
+				r = requests.get("https://ani.gamer.com.tw/ajax/getdeviceid.php", proxies={
+					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
+					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
+				}, headers=headers, timeout=8)
+
+				deviceID = json.loads(r.text)['deviceid']
+				logger.info("BAHAMUT device id: {}".format(deviceID))
+				urls.append(("https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667&device={}".format(deviceID), r.cookies))
+			except Exception as e:
+				#logger.error(str(e.args))
+				BAHAMUT_CODE = 0
+
+		if CHATGPT_TEST and outboundIP != "N/A":
+			urls.append("https://chat.openai.com/backend-api/accounts/check")
+			urls.append("https://chat.openai.com/cdn-cgi/trace")
+		
+		if BILIBILI_TEST and outboundIP != "N/A":
+			urls.append("https://api.bilibili.com/pgc/player/web/playurl?avid=18281381&cid=29892777&qn=0&type=&otype=json&ep_id=183799&fourk=1&fnver=0&fnval=16")
+			urls.append("https://api.bilibili.com/pgc/player/web/playurl?avid=50762638&cid=100279344&qn=0&type=&otype=json&ep_id=268176&fourk=1&fnver=0&fnval=16")
+
+		with concurrent.futures.ThreadPoolExecutor() as executor:
+			results = executor.map(self.getResponse, urls)
+
+		results = list(results)
+
+		if NETFLIX_TEST and outboundIP != "N/A":
+			logger.info("Performing netflix test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			try:
 				sum = 0
-				global ntype
-				r1 = requests.get("https://www.netflix.com/title/70242311", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20)
-				if (r1.status_code == 200):
-					sum += 1
-					soup = BeautifulSoup(r1.text, "html.parser")
-					netflix_ip_str = str(soup.find_all("script"))
-					p1 = netflix_ip_str.find("requestIpAddress")
-					netflix_ip_r = netflix_ip_str[p1 + 19:p1 + 60]
-					p2 = netflix_ip_r.find(",")
-					netflix_ip = netflix_ip_r[0:p2]
-					logger.info("Netflix IP : " + netflix_ip)
+				r1 = results.pop(0)
+				r2 = results.pop(0)
+				if r1 != 0 and r2 != 0:
+					if (r1.status_code == 200):
+						sum += 1
+						soup = BeautifulSoup(r1.text, "html.parser")
+						netflix_ip_str = str(soup.find_all("script"))
+						p1 = netflix_ip_str.find("requestIpAddress")
+						netflix_ip_r = netflix_ip_str[p1 + 19:p1 + 60]
+						p2 = netflix_ip_r.find(",")
+						netflix_ip = netflix_ip_r[0:p2]
+						logger.info("Netflix IP : " + netflix_ip)
 
-				r2 = requests.get("https://www.netflix.com/title/70143836", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20)
-				rg=""
-				if (r2.status_code == 200):
-					sum += 1
-					rg = "("+r2.url.split("com/")[1].split("/")[0]+")"
-				# 测试连接状态
+					rg = ""
+					if (r2.status_code == 200):
+						sum += 1
+						rg = r2.url.split("com/")[1].split("/")[0]
+						if rg != "title":
+							rg = str.upper(rg[:2])
+							rg = "(" + rg + ")"
+						else:
+							rg = ""
+					# 测试连接状态
 
-				if (sum == 0):
-					logger.info("Netflix test result: None.")
-					ntype = "None"
-				elif (sum == 1):
-					logger.info("Netflix test result: Only Original.")
-					ntype = "Only Original"
-				elif (outboundIP == netflix_ip):
-					logger.info("Netflix test result: Full Native.")
-					ntype = "Full Native"+rg
+					if (sum == 0):
+						logger.info("Netflix test result: None.")
+						ntype = "None"
+					elif (sum == 1):
+						logger.info("Netflix test result: Only Original.")
+						ntype = "Only Original"
+					elif (outboundIP == netflix_ip):
+						logger.info("Netflix test result: Full Native.")
+						ntype = "Full Native" + rg
+					else:
+						logger.info("Netflix test result: Full DNS.")
+						ntype = "Full DNS" + rg
 				else:
-					logger.info("Netflix test result: Full DNS.")
-					ntype = "Full DNS"+rg
+					ntype = "Unknown"
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if HBO_TEXT and outboundIP != "N/A":
+		if HBO_TEST and outboundIP != "N/A":
 			logger.info("Performing HBO max test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global htype
-				r = requests.get("https://www.hbomax.com/", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20, allow_redirects=False)
-
-				if (r.status_code == 200):
-					htype = True
+				r = results.pop(0)
+				if r != 0:
+					if (r.status_code == 200):
+						htype = True
+					else:
+						htype = False
 				else:
 					htype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if DISNEY_TEXT and outboundIP != "N/A":
+		if DISNEY_TEST and outboundIP != "N/A":
 			logger.info("Performing Disney plus test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global dtype
-				r1 = requests.get("https://www.disneyplus.com/", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20, allow_redirects=False)
-
-				r2 = requests.get("https://global.edge.bamgrid.com/token", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, headers=headers, timeout=20, allow_redirects=False)
-
-				if (r1.status_code == 200 and r2.status_code != 403):
-					dtype = True
+				r1 = results.pop(0)
+				r2 = results.pop(0)
+				if r1 != 0 and r2 != 0:
+					if (r1.status_code == 200 and r2.status_code != 403):
+						dtype = True
+					else:
+						dtype = False
 				else:
 					dtype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if YOUTUBE_TEXT and outboundIP != "N/A":
+		if YOUTUBE_TEST and outboundIP != "N/A":
 			logger.info("Performing Youtube Premium test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global ytype
-				r = requests.get("https://music.youtube.com/", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20, allow_redirects=False)
+				r = results.pop(0)
 
-				if ("is not available" in r.text):
-					ytype = False
-				elif (r.status_code == 200):
-					ytype = True			
+				if r != 0:
+					if ("is not available" in r.text):
+						ytype = False
+					elif (r.status_code == 200):
+						ytype = True
+					else:
+						ytype = False
 				else:
 					ytype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if TVB_TEXT and outboundIP != "N/A":
+		if TVB_TEST and outboundIP != "N/A":
 			logger.info("Performing TVB test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global ttype
-				r = requests.get("https://www.mytvsuper.com/iptest.php", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20, allow_redirects=False)
-
-				if (r.text.count("HK") > 0):
-					ttype = True
+				r = results.pop(0)
+				if r != 0:
+					tvb_region = json.loads(r.text)['region']
+					if (tvb_region == 1):
+						ttype = True
+					else:
+						ttype = False
 				else:
 					ttype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if ABEMA_TEXT and outboundIP != "N/A":
+		if ABEMA_TEST and outboundIP != "N/A":
 			logger.info("Performing Abema test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global atype
-				r = requests.get("https://api.abema.io/v1/ip/check?device=android", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, timeout=20, allow_redirects=False)
-
-				if (r.text.count("Country") > 0):
-					atype = True
+				r = results.pop(0)
+				if r != 0:
+					if (r.text.count("Country") > 0):
+						atype = True
+					else:
+						atype = False
 				else:
 					atype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
 
-		if BAHAMUT_TEXT and outboundIP != "N/A":
+		if BAHAMUT_TEST and outboundIP != "N/A" and BAHAMUT_CODE:
 			logger.info("Performing Bahamut test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global btype
-				r = requests.get("https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, headers=headers, timeout=20, allow_redirects=False)
-
-				if (r.text.count("animeSn") > 0):
-					btype = True
+				r = results.pop(0)
+				if r != 0:
+					if (r.text.count("animeSn") > 0):
+						btype = True
+					else:
+						btype = False
 				else:
 					btype = False
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
-		
-		if BILIBILI_TEXT and outboundIP != "N/A":
+
+		if CHATGPT_TEST and outboundIP != "N/A":
+			logger.info("Performing ChatGPT test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
+			CHATGPT_REGION_LIST = ['T1', 'XX', 'AL', 'DZ', 'AD', 'AO', 'AG', 'AR', 'AM', 'AU', 'AT', 'AZ', 'BS', 'BD', 'BB', 'BE', 'BZ', 'BJ', 'BT', 'BA', 'BW', 'BR',
+								   'BG', 'BF', 'CV', 'CA', 'CL', 'CO', 'KM', 'CR', 'HR', 'CY', 'DK', 'DJ', 'DM', 'DO', 'EC', 'SV', 'EE', 'FJ', 'FI', 'FR', 'GA', 'GM',
+								   'GE', 'DE', 'GH', 'GR', 'GD', 'GT', 'GN', 'GW', 'GY', 'HT', 'HN', 'HU', 'IS', 'IN', 'ID', 'IQ', 'IE', 'IL', 'IT', 'JM', 'JP', 'JO',
+								   'KZ', 'KE', 'KI', 'KW', 'KG', 'LV', 'LB', 'LS', 'LR', 'LI', 'LT', 'LU', 'MG', 'MW', 'MY', 'MV', 'ML', 'MT', 'MH', 'MR', 'MU', 'MX',
+								   'MC', 'MN', 'ME', 'MA', 'MZ', 'MM', 'NA', 'NR', 'NP', 'NL', 'NZ', 'NI', 'NE', 'NG', 'MK', 'NO', 'OM', 'PK', 'PW', 'PA', 'PG', 'PE',
+								   'PH', 'PL', 'PT', 'QA', 'RO', 'RW', 'KN', 'LC', 'VC', 'WS', 'SM', 'ST', 'SN', 'RS', 'SC', 'SL', 'SG', 'SK', 'SI', 'SB', 'ZA', 'ES',
+								   'LK', 'SR', 'SE', 'CH', 'TH', 'TG', 'TO', 'TT', 'TN', 'TR', 'TV', 'UG', 'AE', 'US', 'UY', 'VU', 'ZM', 'BO', 'BN', 'CG', 'CZ', 'VA',
+								   'FM', 'MD', 'PS', 'KR', 'TW', 'TZ', 'TL', 'GB']
+			try:
+				r1 = results.pop(0)
+				r2 = results.pop(0)
+				if r1 != 0 and r2 != 0:
+					r2text = r2.text
+					r2index = r2text.find('loc=')
+					country_code = r2text[r2index + 4: r2index + 6]
+					if r1.text.count('Error reference number: 1020') == 0 and country_code in CHATGPT_REGION_LIST:
+						ctype = True
+					else:
+						ctype = False
+				else:
+					ctype = False
+
+			except Exception as e:
+				logger.error('代理服务器连接异常：' + str(e.args))
+
+		if BILIBILI_TEST and outboundIP != "N/A":
 			logger.info("Performing Bilibili test LOCAL_PORT: {:d}.".format(LOCAL_PORT))
 			try:
-				headers = {
-					"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"}
-				global bltype
-				r1 = requests.get("https://api.bilibili.com/pgc/player/web/playurl?avid=18281381&cid=29892777&qn=0&type=&otype=json&ep_id=183799&fourk=1&fnver=0&fnval=16", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, headers=headers, timeout=20, allow_redirects=False)
-				r1_code = r1.status_code 
-				r2 =  requests.get("https://api.bilibili.com/pgc/player/web/playurl?avid=50762638&cid=100279344&qn=0&type=&otype=json&ep_id=268176&fourk=1&fnver=0&fnval=16", proxies={
-					"http": "socks5h://127.0.0.1:%d" % LOCAL_PORT,
-					"https": "socks5h://127.0.0.1:%d" % LOCAL_PORT
-				}, headers=headers, timeout=20, allow_redirects=False)
-				r2_code = r2.status_code 
-				if (r1_code == 200):
-					bltype = "港澳台"
-				elif (r2_code == 200):
-					bltype = "台湾"
+				r1 = results.pop(0)
+				r2 = results.pop(0)
+				sumb = 0
+				if r1 != 0 and r2 != 0:
+					if r1.text.count('抱歉您所在地区不可观看') == 0:
+						bltype = "仅限港澳台"
+						sumb += 1
+					if r2.text.count('抱歉您所在地区不可观看') == 0:
+						bltype = "仅限台湾"
+						sumb += 1
+					if sumb == 0:
+						bltype = "N/A"
+					if sumb == 2:
+						bltype = "全解锁"
 				else:
 					bltype = "N/A"
 
 			except Exception as e:
 				logger.error('代理服务器连接异常：' + str(e.args))
-			#
+
 		return (outboundIP, outboundGeo, outboundInfo.get("country_code", "N/A"))
+
 
 	def __tcpPing(self, server, port):
 		res = {
@@ -577,6 +674,7 @@ class SpeedTest(object):
 						global ttype
 						global atype
 						global btype
+						global ctype
 						global bltype
 						global inboundGeoRES
 						global outboundGeoRES
@@ -591,6 +689,7 @@ class SpeedTest(object):
 						_item["Ttype"] = ttype
 						_item["Atype"] = atype
 						_item["Btype"] = btype
+						_item["Ctype"] = ctype
 						_item["Bltype"] = bltype
 						_item["InRes"] = inboundGeoRES
 						_item["OutRes"] = outboundGeoRES

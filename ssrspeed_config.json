@@ -33,6 +33,7 @@
 	"bahamut": true,
 	"bilibili": true,
 	"tvb": true,
+	"chatgpt": true,
 	"geoip":true,
 	"multiplex":true,
 	"web": {
