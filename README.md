@@ -154,4 +154,4 @@ python main.py -u "https://home.yoyu.dev/subscriptionlink" --include 香港 Azur
 
 ## 详细使用方法
 
-- 参见 [SSRSpeed N 使用说明](https://gta5cloud.rip/index.php/2021/08/25/ssrspeedn-%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e/)
+- 参见 [SSRSpeed N 使用说明](https://blog.hxd.gay/index.php/2021/08/25/ssrspeedn-使用说明/)
