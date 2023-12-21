@@ -1,0 +1,26 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天在 UTC 00:00 运行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        ref: 'main' # 确保这里是你的默认分支
+
+    - name: Fetch Upstream
+      run: |
+        git fetch upstream
+        git checkout main # 你的默认分支
+        git merge upstream/main
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: 'main' # 你的默认分支
