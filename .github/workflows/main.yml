@@ -1,0 +1,27 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天在 UTC 00:00 运行，你可以根据需要调整这个时间
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        ref: 'main' # 确保这里是你的fork仓库的默认分支名称，如果不是main，则需要修改
+
+    - name: Sync with Upstream
+      run: |
+        git remote add upstream https://github.com/PauperZ/SSRSpeedN # 使用上游仓库的URL
+        git fetch upstream
+        git checkout main # 确保这里是你的fork仓库的默认分支名称
+        git merge upstream/main # 如果上游仓库的默认分支不是main，需要相应修改
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: 'main' # 确保这里是你的fork仓库的默认分支名称，如果不是main，则需要修改
