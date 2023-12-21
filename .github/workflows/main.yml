@@ -13,17 +13,12 @@ jobs:
       with:
         ref: 'main' # 确保这里是你的fork仓库的默认分支名称，如果不是main，则需要修改
 
-    - name: Setup Git
-      run: |
-        git config user.name "visense" # 替换为你的GitHub用户名
-        git config user.email "visenselx@hotmail.com"   # 替换为你的GitHub邮箱地址
-
     - name: Sync with Upstream
       run: |
         git remote add upstream https://github.com/PauperZ/SSRSpeedN # 使用上游仓库的URL
         git fetch upstream
-        git checkout main # 确保这里是你的fork仓库的默认分支名称，如果不是main，则需要修改
-        git merge upstream/main # 如果上游仓库的默认分支不是main，则需要相应修改
+        git checkout main # 确保这里是你的fork仓库的默认分支名称
+        git merge upstream/main # 如果上游仓库的默认分支不是main，需要相应修改
 
     - name: Push changes
       uses: ad-m/github-push-action@master
