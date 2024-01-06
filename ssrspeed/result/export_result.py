@@ -94,10 +94,10 @@ class ExportResult(object):
 			remark = item["remarks"]
 			inres = item["InRes"]
 			outres = item["OutRes"]
-			maxGroupWidth = max(maxGroupWidth,draw.textsize(group,font=font)[0])
-			maxRemarkWidth = max(maxRemarkWidth,draw.textsize(remark,font=font)[0])
-			lenIn = max(lenIn, draw.textsize(inres, font=font)[0])
-			lenOut = max(lenOut, draw.textsize(outres, font=font)[0])
+			maxGroupWidth = max(maxGroupWidth,int(draw.textlength(group,font=font)))
+			maxRemarkWidth = max(maxRemarkWidth,int(draw.textlength(remark,font=font)))
+			lenIn = max(lenIn, int(draw.textlength(inres, font=font)))
+			lenOut = max(lenOut, int(draw.textlength(outres, font=font)))
 		return (maxGroupWidth + 10,maxRemarkWidth + 10,lenIn + 20,lenOut + 20)
 
 	def __getMaxWidthStream(self,result):
@@ -150,7 +150,7 @@ class ExportResult(object):
 	def __getBasePos(self, width, text):
 		font = self.__font
 		draw = ImageDraw.Draw(Image.new("RGB",(1,1),(255,255,255)))
-		textSize = draw.textsize(text, font=font)[0]
+		textSize = draw.textlength(text, font=font)
 		basePos = (width - textSize) / 2
 		logger.debug("Base Position {}".format(basePos))
 		return basePos
