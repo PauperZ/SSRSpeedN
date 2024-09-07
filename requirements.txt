@@ -9,6 +9,7 @@ flask-cors
 pyyaml
 aiohttp
 aiohttp_socks
+six
 pynat
 beautifulsoup4
 selenium
