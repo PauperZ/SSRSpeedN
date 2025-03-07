@@ -66,16 +66,12 @@ Linux 依赖
 ### 已测试平台
 
 1. Windows 10 x64
-
-放过要饭人士，MacOS和Linux属实没钱测/懒得测，期待更多后浪反馈
+2. Windows 11 x64
+3. Ubuntu 20.04 LTS
 
 ### 理论支持平台
 
 支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray 的平台
-
-### 一定支持平台
-
-支持 SSRSpeedN 的平台
 
 ## 致谢
 
