@@ -44,7 +44,7 @@ None                    未解锁
 - 支持 fast.com / YOUTUBE 码率等多种测速方式（仅限 Windows）
 - 支持 Netflix 解锁测试，分为 原生全解锁 / DNS全解锁 / 仅解锁自制剧 / 无解锁 四档
 - 支持 流媒体平台 Abema/Bahamut 动画疯/Disney+//HBO max/My tvsuper/YouTube premium 的解锁测试
-- 配置文件中提供了测速模块的控制端，可以自由选择是否测速/测ping/检测流媒体解锁
+- 配置文件中提供了测速模块的控制字段，可以自由选择是否测速/测ping/检测流媒体解锁
 - 取消了原版的大红配色，默认为彩虹配色，并增加了新配色 (poor)
 - 无耻地增加了频道tag，可以在 result/export_result.py 中改为自己的tag
 - 增加了节点复用检测功能
