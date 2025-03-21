@@ -626,7 +626,7 @@ class ExportResult(object):
 				pos = inbound_right_position + self.__getBasePos(outbound_right_position - inbound_right_position, outbound_geo)
 				draw.text((pos, 30 * j + 30 + 1), outbound_geo,font=resultFont,fill=(0,0,0))
 
-			if not self.__hide_geoip:
+			if not self.__hide_multiplex:
 				inbound_ip = item["InIP"]
 				outbound_ip = item["OutIP"]
 				if outbound_ip != "N/A":
