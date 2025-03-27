@@ -2,7 +2,7 @@
     <img src="https://i.jpg.dog/4ba3f615ba41e46f17667db1af98a621.png" alt="SSRSpeedN" width="480">
 </h1>
 <p align="center">
-Batch speed measuring tool based on Shadowsocks(R) and V2Ray
+A scalable benchmarking platform for proxy servers with batch testing support
 </p>
 <p align="center">
   <a href="https://github.com/PauperZ/SSRSpeedN/tags"><img src="https://img.shields.io/github/tag/PauperZ/SSRSpeedN.svg"></a>
