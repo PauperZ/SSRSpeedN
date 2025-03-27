@@ -12,7 +12,7 @@ A scalable benchmarking platform for proxy servers with batch testing support
 
 ## 注意事项
 
-- 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性
+- 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix 封锁及 ip 更换，测速具有时效性
 
 - 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装
 - 首次运行前请执行 开始测速.bat 安装 pip 及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装
