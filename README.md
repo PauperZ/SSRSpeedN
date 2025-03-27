@@ -12,7 +12,7 @@ A scalable benchmarking platform for proxy servers with batch testing support
 
 ## 注意事项
 
-- 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix 封锁及 ip 更换，测速具有时效性
+- 测速及解锁测试结果仅供参考，不完全代表实际使用情况，由于网络情况变化、Netflix 封锁及 ip 更换，测试具有时效性
 
 - 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装
 - 首次运行前请执行 开始测速.bat 安装 pip 及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装
@@ -30,7 +30,7 @@ None                    未解锁
 
 ## 特性
 
-本项目在原 SSRSpeed (已跑路) 的基础上，集成了如下特性
+本项目主要针对代理服务器进行批量测试，集成了如下特性
 
 - 支持单线程/多线程同时测速，可以同时反映视频播放/多线程下载等场景的节点速度
 - 支持 fast.com / YOUTUBE 码率等多种测速方式（仅限 Windows）
@@ -38,7 +38,7 @@ None                    未解锁
 - 支持 流媒体平台 Abema/Bahamut 动画疯/Disney+//HBO max/My tvsuper/YouTube premium 的解锁测试
 - 配置文件中提供了测速模块的控制字段，可以自由选择是否测速/测 ping/检测流媒体解锁
 - 取消了原版的大红配色，默认为彩虹配色，并增加了新配色 (poor)
-- 无耻地增加了频道tag，可以在 result/export_result.py 中改为自己的tag
+- Tag 设置默认值，可在 result/export_result.py 中修改为自己的tag
 - 增加了节点复用检测功能
 - 增加了实际流量倍率测试功能
 
@@ -63,7 +63,7 @@ Linux 依赖
 
 ### 理论支持平台
 
-支持 Python 及 Shadowsocks, ShadowsocksR, V2Ray 的平台
+支持 Python 及 支持对应代理协议 的平台
 
 ## 致谢
 
