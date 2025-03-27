@@ -76,8 +76,6 @@ Linux 依赖
 - 建议及支持
   - [jiexi](https://t.me/jiexi001)
   - [萌新黑客](https://t.me/yxkumad)
-- 赞助
-  - [便宜机场测速](https://t.me/cheap_proxy)
 
 ## 代理测速方法
 
