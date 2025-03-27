@@ -15,17 +15,17 @@ A scalable benchmarking platform for proxy servers with batch testing support
 - 测速及解锁测试仅供参考，不代表实际使用情况，由于网络情况变化、Netflix封锁及ip更换，测速具有时效性
 
 - 本项目使用 [Python](https://www.python.org/) 编写，使用前请完成环境安装
-- 首次运行前请执行 开始测速.bat 安装pip及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装
-- logs文件夹用于记录测速日志，包含节点的详细信息及测速订阅，非必要请勿泄露
+- 首次运行前请执行 开始测速.bat 安装 pip 及相关依赖，也可使用 pip install -r requirements.txt 命令自行安装
+- logs 文件夹用于记录测试日志，包含节点 Geoip 的详细信息及代理订阅，非必要请勿泄露
 - 执行 开始测速.bat 批处理命令即可测速，测速结果保存在 results 文件夹下，不过大佬喜欢用命令行测也可以
-- 因为需要依赖 Python 环境，且本项目仍在测试阶段，可能存在部分 bug ，可到 [tg 群组](https://t.me/SSRSpeedN) 进行反馈。
+- 因为需要依赖 Python 环境，且本项目仍在测试阶段，可能存在部分 bug ，可到 [讨论群组](https://t.me/SSRSpeedN) 进行反馈。
 - Netflix 解锁测速结果说明:
 ~~~~text
 Full Native             原生全解锁 
 Full Dns                DNS 全解锁
 Only original           仅解锁自制剧
 None                    未解锁
-其中原生解锁和DNS解锁只是解锁方式有区别，实际体验区别不大，在电视端使用时DNS解锁可能会提示使用代理。
+其中原生解锁和 DNS 解锁只是解锁方式有区别，实际体验区别不大，在电视端使用时 DNS 解锁可能会提示使用代理。
 ~~~~
 
 ## 特性
@@ -36,7 +36,7 @@ None                    未解锁
 - 支持 fast.com / YOUTUBE 码率等多种测速方式（仅限 Windows）
 - 支持 Netflix 解锁测试，分为 原生全解锁 / DNS全解锁 / 仅解锁自制剧 / 无解锁 四档
 - 支持 流媒体平台 Abema/Bahamut 动画疯/Disney+//HBO max/My tvsuper/YouTube premium 的解锁测试
-- 配置文件中提供了测速模块的控制字段，可以自由选择是否测速/测ping/检测流媒体解锁
+- 配置文件中提供了测速模块的控制字段，可以自由选择是否测速/测 ping/检测流媒体解锁
 - 取消了原版的大红配色，默认为彩虹配色，并增加了新配色 (poor)
 - 无耻地增加了频道tag，可以在 result/export_result.py 中改为自己的tag
 - 增加了节点复用检测功能
@@ -67,7 +67,7 @@ Linux 依赖
 
 ## 致谢
 
-- 原作者
+- 基础框架开发者
   - [NyanChanMeow](https://github.com/NyanChanMeow)
 - beta版测试
   - [ChenBilly](https://t.me/ChenBilly)
