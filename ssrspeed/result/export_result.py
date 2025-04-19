@@ -94,10 +94,15 @@ class ExportResult(object):
 			remark = item["remarks"]
 			inres = item["InRes"]
 			outres = item["OutRes"]
-			maxGroupWidth = max(maxGroupWidth,int(draw.textlength(group,font=font)))
-			maxRemarkWidth = max(maxRemarkWidth,int(draw.textlength(remark,font=font)))
-			lenIn = max(lenIn, int(draw.textlength(inres, font=font)))
-			lenOut = max(lenOut, int(draw.textlength(outres, font=font)))
+			#maxGroupWidth = max(maxGroupWidth,draw.textsize(group,font=font)[0])
+			maxGroupWidth = max(maxGroupWidth, draw.textbbox((0, 0), group, font=font)[2])
+
+			#maxRemarkWidth = max(maxRemarkWidth,draw.textsize(remark,font=font)[0])
+			maxRemarkWidth = max(maxRemarkWidth,draw.textbbox((0, 0), remark, font=font)[2])
+			#lenIn = max(lenIn, draw.textsize(inres, font=font)[0])
+			#lenOut = max(lenOut, draw.textsize(outres, font=font)[0])
+			lenIn=max(lenIn, draw.textbbox((0, 0), inres, font=font)[2])
+			lenOut=max(lenOut, draw.textbbox((0, 0), outres, font=font)[2])
 		return (maxGroupWidth + 10,maxRemarkWidth + 10,lenIn + 20,lenOut + 20)
 
 	def __getMaxWidthStream(self,result):
@@ -150,8 +155,11 @@ class ExportResult(object):
 	def __getBasePos(self, width, text):
 		font = self.__font
 		draw = ImageDraw.Draw(Image.new("RGB",(1,1),(255,255,255)))
-		textSize = draw.textlength(text, font=font)
-		basePos = (width - textSize) / 2
+		#textSize = draw.textsize(text, font=font)[0]
+		text_bbox = draw.textbbox((0, 0), text, font=font)
+		text_width = text_bbox[2] - text_bbox[0]
+		basePos = (width - text_width) / 2
+		#basePos = (width - textSize) / 2
 		logger.debug("Base Position {}".format(basePos))
 		return basePos
 
@@ -626,7 +634,7 @@ class ExportResult(object):
 				pos = inbound_right_position + self.__getBasePos(outbound_right_position - inbound_right_position, outbound_geo)
 				draw.text((pos, 30 * j + 30 + 1), outbound_geo,font=resultFont,fill=(0,0,0))
 
-			if not self.__hide_multiplex:
+			if not self.__hide_geoip:
 				inbound_ip = item["InIP"]
 				outbound_ip = item["OutIP"]
 				if outbound_ip != "N/A":
@@ -726,7 +734,9 @@ class ExportResult(object):
 		'''
 		
 		draw.line((0,newImageHeight - 1,imageRightPosition,newImageHeight - 1),fill=(127,127,127),width=1)
-		filename = "./results/" + time.strftime("%Y-%m-%d-%H-%M-%S", generatedTime) + ".png"
+		appendix = result[1]
+		#filename = "./results/" + time.strftime("%Y-%m-%d-%H-%M-%S", generatedTime) + ".png"
+		filename = "./results/" + appendix["group"] + ".png"
 		resultImg.save(filename)
 		files.append(filename)
 		logger.info("Result image saved as %s" % filename)
@@ -785,7 +795,8 @@ class ExportResult(object):
 
 	def __exportAsJson(self,result):
 	#	result = self.__deweighting(result)
-		filename = "./results/" + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + ".json"
+		appendix = result[1]
+		filename = "./results/" + appendix["group"] + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + ".json"
 		with open(filename,"w+",encoding="utf-8") as f:
 			f.writelines(json.dumps(result,sort_keys=True,indent=4,separators=(',',':')))
 		logger.info("Result exported as %s" % filename)
