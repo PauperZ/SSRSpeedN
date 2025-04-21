@@ -542,7 +542,7 @@ class SpeedTest(object):
 				)
 				client = self.__get_client(node.node_type)
 				if not client:
-					logger.warn(f"Unknown Node Type: {node.node_type}")
+					logger.warning(f"Unknown Node Type: {node.node_type}")
 					node = self.__get_next_config()
 					continue
 				_item = self.__getBaseResult()
@@ -665,7 +665,7 @@ class SpeedTest(object):
 
 						testRes = st.startTest(self.__testMethod)
 						if (int(testRes[0]) == 0):
-							logger.warn("Re-testing node.")
+							logger.warning("Re-testing node.")
 							testRes = st.startTest(self.__testMethod)
 						global ntype
 						global htype
