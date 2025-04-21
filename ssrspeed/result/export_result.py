@@ -1,5 +1,6 @@
 #coding:utf-8
 
+import re
 from PIL import Image,ImageDraw,ImageFont
 import json
 import os
@@ -27,6 +28,9 @@ from config import config
 			"maxDSpeed":12435646 #Bytes
 		}
 '''
+def sanitize_filename(name):
+    	# 去除非法文件名字符（Windows/Unix 通用）
+		return re.sub(r'[\\/:*?"<>|]', "_", name)
 
 class ExportResult(object):
 	def __init__(self):
@@ -735,8 +739,10 @@ class ExportResult(object):
 		
 		draw.line((0,newImageHeight - 1,imageRightPosition,newImageHeight - 1),fill=(127,127,127),width=1)
 		appendix = result[1]
+		# 设置默认组名
+		group_name = appendix.get("group") or "default_group"
 		#filename = "./results/" + time.strftime("%Y-%m-%d-%H-%M-%S", generatedTime) + ".png"
-		filename = "./results/" + appendix["group"] + ".png"
+		filename = "./results/" + group_name + ".png"
 		resultImg.save(filename)
 		files.append(filename)
 		logger.info("Result image saved as %s" % filename)
@@ -792,13 +798,31 @@ class ExportResult(object):
 				return self.__newMixColor(rgb1,rgb2,rt)
 		return (255,255,255)
 
+	
 
-	def __exportAsJson(self,result):
-	#	result = self.__deweighting(result)
+	def __exportAsJson(self, result):
+		for item in result:
+			group = item.get("group", "").strip()
+			if not group or group.upper() == "N/A":
+				group = "DefaultGroup"
+			item["group"] = group
+
 		appendix = result[1]
-		filename = "./results/" + appendix["group"] + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + ".json"
-		with open(filename,"w+",encoding="utf-8") as f:
-			f.writelines(json.dumps(result,sort_keys=True,indent=4,separators=(',',':')))
+		group_name = appendix.get("group", "DefaultGroup").strip()
+		if not group_name or group_name.upper() == "N/A":
+			group_name = "DefaultGroup"
+
+		# 清理非法文件名字符
+		group_name = sanitize_filename(group_name) 
+
+		filename = "./results/" + group_name + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + ".json"
+
+		# 确保目录存在
+		os.makedirs("./results", exist_ok=True)
+
+		with open(filename, "w+", encoding="utf-8") as f:
+			f.writelines(json.dumps(result, sort_keys=True, indent=4, separators=(',', ':')))
+
 		logger.info("Result exported as %s" % filename)
 		return result
 

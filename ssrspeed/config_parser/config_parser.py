@@ -85,7 +85,7 @@ class UniversalParser:
 				if cfg:
 					node = NodeShadowsocks(cfg)
 				else:
-					logger.warn(f"Invalid shadowsocks link {link}")
+					logger.warning(f"Invalid shadowsocks link {link}")
 
 			elif link[:6] == "ssr://":
 				#ShadowsocksR
@@ -94,7 +94,7 @@ class UniversalParser:
 				if cfg:
 					node = NodeShadowsocksR(cfg)
 				else:
-					logger.warn(f"Invalid shadowsocksR link {link}")
+					logger.warning(f"Invalid shadowsocksR link {link}")
 
 			elif link[:8] == "vmess://":
 				#Vmess link (V2RayN and Quan)

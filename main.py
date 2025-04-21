@@ -71,11 +71,6 @@ if (__name__ == "__main__"):
 					pass
 		sys.exit(0)
 
-	# print("****** Import Hint 重要提示******")
-	# print("ChenBilly yyds！")
-	# print("*********************************")
-	# input("Press ENTER to conitnue or Crtl+C to exit.")
-
 	if (options.debug):
 		DEBUG = options.debug
 		for item in loggerList:
@@ -97,7 +92,7 @@ if (__name__ == "__main__"):
 		rc = RequirementsCheck()
 		rc.check()
 	else:
-		logger.warn("Requirements check skipped.")
+		logger.warning("Requirements check skipped.")
 
 	'''
 	if (options.proxy_type):
