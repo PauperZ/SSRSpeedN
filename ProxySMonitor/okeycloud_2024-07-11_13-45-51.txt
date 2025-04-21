@@ -1,0 +1,21 @@
+****** Import Hint 重要提示******
+ChenBilly yyds！
+*********************************
+Press ENTER to conitnue or Crtl+C to exit.[2024-07-11 13:53:30,134][[37;1mINFO[0m][139975684096000][[35mmain.py[0m:91][37mSSRSpeed 1.04, Web Api Version 0.5.2[0m
+[2024-07-11 13:53:30,139][[37;1mWARNING[0m][139975684096000][[35mmain.py[0m:100][33;1mRequirements check skipped.[0m
+[2024-07-11 13:53:31,076][[37;1mINFO[0m][139975684096000][[35mconfig_parser.py[0m:191][37mReading https://api3.okaycloud.top/api/v1/client/subscribe?token=87wv8a2cm0a2ck0buga250784a7bq318[0m
+[2024-07-11 13:53:32,749][[37;1mINFO[0m][139975684096000][[35mconfig_parser.py[0m:252][37mBase64 decode failed.[0m
+/root/ProxySMonitor/ssrspeedn/main.py:100: DeprecationWarning: The 'warn' method is deprecated, use 'warning' instead
+  logger.warn("Requirements check skipped.")
+Traceback (most recent call last):
+  File "/root/ProxySMonitor/ssrspeedn/main.py", line 218, in <module>
+    sc.console_setup(
+  File "/root/ProxySMonitor/ssrspeedn/ssrspeed/core/ssrspeed_core.py", line 176, in console_setup
+    self.__parser.read_subscription(url.split(" "))
+  File "/root/ProxySMonitor/ssrspeedn/ssrspeed/config_parser/config_parser.py", line 256, in read_subscription
+    self.__nodes.extend(self.__parse_clash(rep))
+  File "/root/ProxySMonitor/ssrspeedn/ssrspeed/config_parser/config_parser.py", line 144, in __parse_clash
+    pc.parse_config(clash_cfg)
+  File "/root/ProxySMonitor/ssrspeedn/ssrspeed/config_parser/clash_parser.py", line 184, in parse_config
+    for cfg in clash_cfg["proxies"]:
+KeyError: 'proxies'
