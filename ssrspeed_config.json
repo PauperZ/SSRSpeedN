@@ -1,0 +1,187 @@
+{
+	"localAddress": "127.0.0.1",
+	"localPort": 10870,
+	"excludeRemarks": [
+		"剩余流量",
+		"到期时间",
+		"过期时间"
+	],
+	"proxy": {
+		"enabled": false,
+		"address": "127.0.0.1",
+		"port": 1080,
+		"username": null,
+		"password": null
+	},
+	"ntt": {
+		"enabled": true,
+		"internal_ip": "0.0.0.0",
+		"internal_port": 54320
+	},
+	"ping": false,
+	"gping": true,
+	"port": true,
+	"speed": true,
+	"method": "SOCKET",
+	"StSpeed": false,
+	"netflix": true,
+	"stream": true,
+	"hbo": true,
+	"disney": true,
+	"youtube": true,
+	"abema": true,
+	"bahamut": true,
+	"bilibili": true,
+	"tvb": true,
+	"chatgpt": true,
+	"geoip":true,
+	"multiplex":true,
+	"web": {
+		"listen": "127.0.0.1",
+		"port": 10870,
+		"token": ""
+	},
+	"exportResult": {
+		"uploadResult": false,
+		"hide_max_speed": false,
+		"font": "./resources/fonts/SourceHanSansCN-Medium.otf",
+		"colors": [
+			{
+				"name": "origin",
+				"colors": {
+					"4.0": [
+						102,
+						255,
+						102
+					],
+					"8.0": [
+						255,
+						255,
+						102
+					],
+					"16.0": [
+						255,
+						178,
+						102
+					],
+					"24.0": [
+						255,
+						102,
+						102
+					],
+					"32.0": [
+						226,
+						140,
+						255
+					],
+					"40.0": [
+						102,
+						204,
+						255
+					],
+					"50.0": [
+						102,
+						102,
+						255
+					]
+				}
+			},
+			{
+				"name": "poor",
+				"colors": {
+					"4.0": [
+						255,
+						215,
+						0
+					],
+					"8.0": [
+						255,
+						178,
+						1
+					],
+					"16.0": [
+						252,
+						105,
+						114
+					],
+					"24.0": [
+						233,
+						130,
+						217
+					],
+					"32.0": [
+						194,
+						108,
+						255
+					],
+					"40.0": [
+						102,
+						192,
+						255
+					],
+					"50.0": [
+						102,
+						111,
+						255
+					]
+				}
+			}
+		]
+	},
+	"uploadResult": {
+		"apiToken": "",
+		"server": "",
+		"remark": "Example Remark."
+	},
+	"fileDownload": {
+		"maxWorkers": 4,
+		"buffer": 4096,
+		"skipRuleMatch": false,
+		"rules": [
+			{
+				"mode": "match_isp",
+				"ISP": "Microsoft Corporation",
+				"tag": "Google"
+			},
+			{
+				"mode": "match_isp",
+				"ISP": "Google LLC",
+				"tag": "Default"
+			},
+			{
+				"mode": "match_location",
+				"countries": [
+					"TH"
+				],
+				"tag": "Google"
+			}
+		],
+		"downloadLinks": [
+			{
+				"link": "https://dl.google.com/dl/android/studio/install/3.4.1.0/android-studio-ide-183.5522156-windows.exe",
+				"fileSize": 971,
+				"tag": "Default"
+			},
+			{
+				"link": "https://dl.google.com/dl/android/studio/install/3.4.1.0/android-studio-ide-183.5522156-windows.exe",
+				"fileSize": 971,
+				"tag": "Google"
+			}
+		]
+	},
+	"webPageSimulation": {
+		"maxThread": 4,
+		"urls": [
+			"https://www.google.com.hk",
+			"https://www.youtube.com",
+			"https://www.bing.com",
+			"https://www.github.com",
+			"https://www.microsoft.com"
+		],
+		"cnUrls": [
+			"https://www.baidu.com",
+			"https://www.weibo.com",
+			"https://www.qq.com"
+		]
+	}
+}
