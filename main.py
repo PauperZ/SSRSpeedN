@@ -97,7 +97,7 @@ if (__name__ == "__main__"):
 		rc = RequirementsCheck()
 		rc.check()
 	else:
-		logger.warn("Requirements check skipped.")
+		logger.warning("Requirements check skipped.")
 
 	'''
 	if (options.proxy_type):
@@ -110,7 +110,7 @@ if (__name__ == "__main__"):
 		elif (options.proxy_type.lower() == "v2ray"):
 			PROXY_TYPE = "V2RAY"
 		else:
-			logger.warn("Unknown proxy type {} ,using default ssr.".format(options.proxy_type))
+			logger.warning("Unknown proxy type {} ,using default ssr.".format(options.proxy_type))
 	'''
 
 	#print(options.test_method)
